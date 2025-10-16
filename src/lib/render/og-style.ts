@@ -1,25 +1,43 @@
-// Expanded cute pastel color palette
-const PASTEL_COLORS = [
-  { bg: "#FFF5F7", text: "#4A3B47" }, // soft pink
-  { bg: "#F0F4FF", text: "#3B4A5C" }, // soft blue
-  { bg: "#F5FFF0", text: "#3B5C3B" }, // soft green
-  { bg: "#FFF8F0", text: "#5C4A3B" }, // soft peach
-  { bg: "#F8F0FF", text: "#4A3B5C" }, // soft lavender
-  { bg: "#F0FFFA", text: "#3B5C4A" }, // soft mint
-  { bg: "#FFF0F8", text: "#5C3B4A" }, // soft rose
-  { bg: "#F5F0FF", text: "#473B5C" }, // soft periwinkle
-  { bg: "#FFF9F0", text: "#5C4B3B" }, // soft cream
-  { bg: "#F0F8FF", text: "#3B485C" }, // soft sky
-  { bg: "#F8FFF0", text: "#485C3B" }, // soft sage
-  { bg: "#FFF0F5", text: "#5C3B48" }, // soft blush
-  { bg: "#F0FFF8", text: "#3B5C48" }, // soft seafoam
-  { bg: "#F5F8FF", text: "#3B475C" }, // soft powder
-  { bg: "#FFF8F5", text: "#5C483B" }, // soft sand
-  { bg: "#F8F5FF", text: "#483B5C" }, // soft lilac
-  { bg: "#F0FFF0", text: "#3B5C3B" }, // soft honeydew
-  { bg: "#FFF5F0", text: "#5C3B3B" }, // soft coral
-  { bg: "#F5FFF8", text: "#3B5C45" }, // soft spring
-  { bg: "#F8F0F5", text: "#5C3B48" }, // soft mauve
+// Cute color palette - lots of pinks, purples, and blues with valid hex codes
+const AESTHETIC_COLORS = [
+  { bg: "#FEF9FF", text: "#4A1A5A", highlight: "#B83AAA" }, // soft pink bg, purple text, bright purple highlight
+  { bg: "#FDF8FF", text: "#3A1A4A", highlight: "#9A2A8A" }, // pale purple bg, dark purple text, bright purple highlight
+  { bg: "#FCF9FF", text: "#5A1A7A", highlight: "#C83ABA" }, // blush bg, purple text, magenta highlight
+  { bg: "#FEF8FE", text: "#4A1A3A", highlight: "#B82A7A" }, // rose bg, dark text, rose highlight
+  { bg: "#FDF9FE", text: "#3A1A2A", highlight: "#9A2A5A" }, // pink bg, dark text, pink highlight
+  
+  { bg: "#F9FCFF", text: "#1A2A5A", highlight: "#3A5AAA" }, // pale blue bg, blue text, bright blue highlight
+  { bg: "#F8FBFF", text: "#0A1A4A", highlight: "#2A4A9A" }, // sky bg, navy text, blue highlight
+  { bg: "#FAFDFF", text: "#1A3A6A", highlight: "#4A6ACA" }, // powder bg, blue text, bright blue highlight
+  { bg: "#F7FAFF", text: "#0A2A5A", highlight: "#2A5ABA" }, // ice bg, blue text, bright blue highlight
+  { bg: "#F9FDFF", text: "#1A4A7A", highlight: "#4A7ADA" }, // frost bg, blue text, bright blue highlight
+  
+  { bg: "#FEFAFF", text: "#4A1A6A", highlight: "#B83ACA" }, // lavender bg, purple text, bright purple highlight
+  { bg: "#FDF9FF", text: "#3A1A5A", highlight: "#9A2ABA" }, // lilac bg, purple text, bright purple highlight
+  { bg: "#FCF8FF", text: "#5A1A8A", highlight: "#CA3ADA" }, // violet bg, purple text, bright violet highlight
+  { bg: "#FBF7FF", text: "#4A1A7A", highlight: "#BA3ACA" }, // periwinkle bg, purple text, bright purple highlight
+  { bg: "#FAF6FF", text: "#6A1A9A", highlight: "#DA3AEA" }, // amethyst bg, purple text, bright purple highlight
+  
+  { bg: "#FFF9FE", text: "#5A1A4A", highlight: "#CA2A8A" }, // cotton candy bg, purple text, bright pink highlight
+  { bg: "#FEF8FD", text: "#4A1A3A", highlight: "#BA2A7A" }, // ballet bg, dark text, pink highlight
+  { bg: "#FDF7FC", text: "#3A1A2A", highlight: "#AA2A6A" }, // blush bg, dark text, pink highlight
+  { bg: "#FCF6FB", text: "#5A1A4A", highlight: "#CA2A8A" }, // powder pink bg, purple text, bright pink highlight
+  { bg: "#FBF5FA", text: "#4A1A3A", highlight: "#BA2A7A" }, // dusty rose bg, dark text, rose highlight
+  
+  { bg: "#F8F9FF", text: "#2A1A5A", highlight: "#6A3AAA" }, // whisper blue bg, purple text, blue-purple highlight
+  { bg: "#F7F8FF", text: "#1A1A4A", highlight: "#5A3A9A" }, // mist bg, blue text, purple highlight
+  { bg: "#F6F7FF", text: "#0A1A3A", highlight: "#4A3A8A" }, // cloud bg, navy text, purple highlight
+  { bg: "#F5F6FF", text: "#1A0A4A", highlight: "#6A2A9A" }, // vapor bg, purple text, bright purple highlight
+  { bg: "#F4F5FF", text: "#2A0A5A", highlight: "#7A2AAA" }, // haze bg, purple text, bright purple highlight
+  
+  { bg: "#FFF8FE", text: "#5A1A5A", highlight: "#DA3ADA" }, // fairy pink bg, purple text, bright magenta highlight
+  { bg: "#FEF7FD", text: "#4A1A4A", highlight: "#CA3ACA" }, // tulle bg, purple text, bright purple highlight
+  { bg: "#FDF6FC", text: "#3A1A3A", highlight: "#BA3ABA" }, // silk bg, dark text, purple highlight
+  { bg: "#FCF5FB", text: "#5A1A5A", highlight: "#DA3ADA" }, // chiffon bg, purple text, bright magenta highlight
+  { bg: "#FBF4FA", text: "#4A1A4A", highlight: "#CA3ACA" }, // organza bg, purple text, bright purple highlight
+  
+  { bg: "#F9FAFF", text: "#2A2A5A", highlight: "#6A6AAA" }, // pearl bg, blue-purple text, lavender highlight
+  { bg: "#F8F9FE", text: "#1A2A4A", highlight: "#5A6A9A" }, // opal bg, blue text, blue-purple highlight
 ] as const;
 
 // Simple hash function to get consistent color for same text
@@ -35,7 +53,24 @@ function hashString(str: string): number {
 
 export function getColorForText(text: string) {
   const hash = hashString(text);
-  return PASTEL_COLORS[hash % PASTEL_COLORS.length];
+  return AESTHETIC_COLORS[hash % AESTHETIC_COLORS.length];
+}
+
+// New function to get highlight color for emphasis
+export function getHighlightStyle(colors: any, text: string) {
+  // Find the last line or most important part to highlight
+  const lines = text.split('\n');
+  const lastLine = lines[lines.length - 1];
+  
+  // Simple heuristic: highlight shorter lines (often the punchline)
+  const shouldHighlight = lastLine.length < 50 || lines.length > 2;
+  
+  return shouldHighlight ? {
+    background: `linear-gradient(120deg, ${colors.highlight}40 0%, ${colors.highlight}20 100%)`,
+    padding: "4px 12px",
+    borderRadius: "8px",
+    display: "inline-block"
+  } : {};
 }
 
 // Prevent orphaned words by adding non-breaking spaces

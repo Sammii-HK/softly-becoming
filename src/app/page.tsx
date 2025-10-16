@@ -30,7 +30,7 @@ export default function Home() {
                   Join the Daily Newsletter
                 </a>
                 <p className="text-sm opacity-60">
-                  Free gentle notes each morning • 12,000+ women rebuilding softly
+                  Free gentle notes each morning • Join women rebuilding with intention
                 </p>
               </div>
             </div>
@@ -89,7 +89,7 @@ export default function Home() {
               <p className="opacity-70 mb-4">
                 Follow along on Instagram, Pinterest, and X for daily gentle wisdom.
               </p>
-              <a href="https://instagram.com/softlybecoming" className="text-blue-600 font-medium hover:underline">
+              <a href="https://www.instagram.com/softly.becoming.studio/" className="text-blue-600 font-medium hover:underline">
                 Follow along →
               </a>
             </div>
@@ -204,22 +204,50 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Social Proof */}
+      {/* Social Connection */}
       <section className="py-16 bg-[#FAF9F7]">
         <div className="max-w-4xl mx-auto px-6 text-center">
-          <div className="grid md:grid-cols-3 gap-8">
-            <div>
-              <div className="text-3xl font-serif text-purple-600 mb-2">12K+</div>
-              <p className="text-gray-600">Women rebuilding softly</p>
-            </div>
-            <div>
-              <div className="text-3xl font-serif text-purple-600 mb-2">Daily</div>
-              <p className="text-gray-600">Gentle inspiration</p>
-            </div>
-            <div>
-              <div className="text-3xl font-serif text-purple-600 mb-2">4</div>
-              <p className="text-gray-600">Social platforms</p>
-            </div>
+          <h2 className="text-3xl font-serif mb-8">Connect & Follow Along</h2>
+          <div className="grid md:grid-cols-4 gap-6">
+            <a 
+              href="https://www.instagram.com/softly.becoming.studio/" 
+              target="_blank"
+              className="bg-white p-6 rounded-xl shadow-sm hover:shadow-md transition-shadow group"
+            >
+              <div className="text-3xl mb-3">📸</div>
+              <div className="font-medium mb-1">Instagram</div>
+              <div className="text-sm text-gray-600">Daily gentle wisdom</div>
+            </a>
+            
+            <a 
+              href="https://uk.pinterest.com/softlybecomingstudio/" 
+              target="_blank"
+              className="bg-white p-6 rounded-xl shadow-sm hover:shadow-md transition-shadow group"
+            >
+              <div className="text-3xl mb-3">📌</div>
+              <div className="font-medium mb-1">Pinterest</div>
+              <div className="text-sm text-gray-600">Quote collections</div>
+            </a>
+            
+            <a 
+              href="https://x.com/softly_becoming" 
+              target="_blank"
+              className="bg-white p-6 rounded-xl shadow-sm hover:shadow-md transition-shadow group"
+            >
+              <div className="text-3xl mb-3">🐦</div>
+              <div className="font-medium mb-1">X (Twitter)</div>
+              <div className="text-sm text-gray-600">Gentle thoughts</div>
+            </a>
+            
+            <a 
+              href="https://bsky.app/profile/softlybecoming.bsky.social" 
+              target="_blank"
+              className="bg-white p-6 rounded-xl shadow-sm hover:shadow-md transition-shadow group"
+            >
+              <div className="text-3xl mb-3">🦋</div>
+              <div className="font-medium mb-1">Bluesky</div>
+              <div className="text-sm text-gray-600">Authentic connection</div>
+            </a>
           </div>
         </div>
       </section>
@@ -232,11 +260,12 @@ export default function Home() {
               <h3 className="text-2xl font-serif mb-4">Softly Becoming</h3>
               <p className="opacity-80 mb-4">
                 Supporting women in gentle transformation through daily inspiration and beautiful resources.
-              </p>
-              <div className="flex gap-4">
-                <a href="#" className="opacity-60 hover:opacity-100 transition-opacity">Instagram</a>
-                <a href="#" className="opacity-60 hover:opacity-100 transition-opacity">Pinterest</a>
-                <a href="#" className="opacity-60 hover:opacity-100 transition-opacity">X (Twitter)</a>
+        </p>
+        <div className="flex gap-4">
+                <a href="https://www.instagram.com/softly.becoming.studio/" target="_blank" className="opacity-60 hover:opacity-100 transition-opacity">Instagram</a>
+                <a href="https://uk.pinterest.com/softlybecomingstudio/" target="_blank" className="opacity-60 hover:opacity-100 transition-opacity">Pinterest</a>
+                <a href="https://x.com/softly_becoming" target="_blank" className="opacity-60 hover:opacity-100 transition-opacity">X</a>
+                <a href="https://bsky.app/profile/softlybecoming.bsky.social" target="_blank" className="opacity-60 hover:opacity-100 transition-opacity">Bluesky</a>
               </div>
             </div>
             
@@ -259,8 +288,8 @@ export default function Home() {
           
           <div className="border-t border-gray-600 mt-8 pt-8 text-center text-sm opacity-60">
             <p>&copy; 2025 Softly Becoming. All rights reserved.</p>
-          </div>
         </div>
+      </div>
       </footer>
     </main>
   );

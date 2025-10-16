@@ -34,8 +34,14 @@ export async function GET(req: NextRequest) {
   const text = preventOrphanedWords(spacedText);
   const colors = getColorForText(rawText);
   
-  // Load custom font (same as your homepage uses)
-  const fontData = await loadGoogleFont('Inter:wght@300;400', text);
+  // Load custom font - try serif font that should work better
+  let fontData;
+  try {
+    fontData = await loadGoogleFont('Crimson+Text:wght@400;600', text);
+  } catch (error) {
+    console.log('Font loading failed, using system font');
+    fontData = null;
+  }
   
   // Split text to highlight the last line like your example
   const lines = text.split('\n').filter(line => line.trim());
@@ -63,10 +69,10 @@ export async function GET(req: NextRequest) {
         {mainText && (
           <div
             style={{
-              fontFamily: "Inter",
-              fontWeight: "300",
-              fontSize: 48,
-              lineHeight: 1.4,
+              fontFamily: fontData ? "Crimson Text" : "ui-serif, Georgia, serif",
+              fontWeight: "400",
+              fontSize: 50,
+              lineHeight: 1.3,
               textAlign: "center",
               maxWidth: "700px",
               whiteSpace: "pre-wrap"
@@ -80,14 +86,14 @@ export async function GET(req: NextRequest) {
         {highlightText && (
           <div
             style={{
-              fontFamily: "Inter",
-              fontWeight: "400",
-              fontSize: 48,
-              lineHeight: 1.4,
+              fontFamily: fontData ? "Crimson Text" : "ui-serif, Georgia, serif",
+              fontWeight: "600",
+              fontSize: 50,
+              lineHeight: 1.3,
               textAlign: "center",
               maxWidth: "700px",
               fontStyle: "italic",
-              color: colors.highlight, // Use highlight color for text, not background
+              color: colors.highlight, // Saturated highlight color
               padding: "8px 0"
             }}
           >
@@ -114,13 +120,15 @@ export async function GET(req: NextRequest) {
     {
       width: 1080,
       height: 1080,
-      fonts: [
-        {
-          name: 'Inter',
-          data: fontData,
-          style: 'normal',
-        },
-      ],
+      ...(fontData && {
+        fonts: [
+          {
+            name: 'Crimson Text',
+            data: fontData,
+            style: 'normal',
+          },
+        ],
+      }),
     }
   );
 }
