@@ -76,9 +76,9 @@ export async function postToSucculent({
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        // Add any auth headers if needed
+        // Succulent API expects X-API-Key header, not Authorization
         ...(process.env.SUCCULENT_API_KEY && {
-          "Authorization": `Bearer ${process.env.SUCCULENT_API_KEY}`
+          "X-API-Key": process.env.SUCCULENT_API_KEY
         })
       },
       body: JSON.stringify(payload)
