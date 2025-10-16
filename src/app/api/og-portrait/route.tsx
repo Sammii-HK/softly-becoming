@@ -1,5 +1,6 @@
 import { ImageResponse } from "@vercel/og";
 import { NextRequest } from "next/server";
+import { getColorForText } from "@/lib/render/og-style";
 import React from "react";
 
 export const runtime = "edge";
@@ -11,6 +12,7 @@ export const runtime = "edge";
 export async function GET(req: NextRequest) {
   const { searchParams } = new URL(req.url);
   const text = (searchParams.get("text") ?? "soft rebuild").replace(/\\n/g, "\n");
+  const colors = getColorForText(text);
   // const fontData = await FONT;
 
   return new ImageResponse(
@@ -18,21 +20,22 @@ export async function GET(req: NextRequest) {
       <div style={{
         width: 1080, 
         height: 1920, 
-        background: "#FAF9F7", 
-        color: "#3A3A3A",
+        background: colors.bg,
+        color: colors.text,
         display: "flex", 
         alignItems: "center", 
         justifyContent: "center", 
-        padding: 96
+        padding: 160 // More breathing room for portrait
       }}>
         <div style={{
           fontFamily: "serif", 
-          fontSize: 88, 
-          lineHeight: 1.25, 
-          letterSpacing: "-0.01em",
+          fontSize: 64, // Smaller for portrait, more elegant
+          lineHeight: 1.4, 
+          letterSpacing: "-0.005em",
           whiteSpace: "pre-wrap", 
-          maxWidth: 840, 
-          textAlign: "left"
+          maxWidth: 600, // Shorter lines to avoid orphaned words
+          textAlign: "left", // Back to left-aligned as requested
+          fontWeight: "400"
         }}>
           {text}
         </div>

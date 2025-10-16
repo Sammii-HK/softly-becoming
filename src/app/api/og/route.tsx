@@ -1,6 +1,6 @@
 import { ImageResponse } from "@vercel/og";
 import { NextRequest } from "next/server";
-import { baseStyle, textStyle } from "@/lib/render/og-style";
+import { baseStyle, textStyle, getColorForText } from "@/lib/render/og-style";
 import React from "react";
 
 export const runtime = "edge";
@@ -12,17 +12,23 @@ export const runtime = "edge";
 export async function GET(req: NextRequest) {
   const { searchParams } = new URL(req.url);
   const text = searchParams.get("text") ?? "soft rebuild";
+  const colors = getColorForText(text);
   // const fontData = await FONT;
 
   return new ImageResponse(
     (
-      <div style={baseStyle as any}>
+      <div 
+        style={{
+          ...baseStyle,
+          background: colors.bg,
+          color: colors.text,
+        } as any}
+      >
         <div
           style={{
             ...textStyle,
             fontFamily: "serif",
-            maxWidth: 880,
-            textAlign: "left",
+            fontWeight: "400",
           }}
         >
           {text}
