@@ -1,0 +1,69 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Subscriber {
+  id           String       @id @default(cuid())
+  email        String       @unique
+  name         String?
+  status       Status       @default(ACTIVE)
+  tier         Tier         @default(FREE)
+  source       String?
+  stripeId     String?
+  createdAt    DateTime     @default(now())
+  updatedAt    DateTime     @updatedAt
+  emailEvents  EmailEvent[]
+}
+
+model EmailEvent {
+  id           String     @id @default(cuid())
+  subscriber   Subscriber @relation(fields: [subscriberId], references: [id])
+  subscriberId String
+  messageId    String?
+  type         EventType
+  ts           DateTime   @default(now())
+  meta         Json?
+}
+
+model Letter {
+  id         String       @id @default(cuid())
+  slug       String       @unique
+  subject    String
+  theme      String
+  lineToKeep String
+  bodyJson   Json
+  bodyHtml   String
+  bodyText   String
+  status     LetterStatus @default(DRAFT)
+  sendAt     DateTime?
+  createdAt  DateTime     @default(now())
+  updatedAt  DateTime     @updatedAt
+}
+
+enum Status {
+  ACTIVE
+  BOUNCED
+  UNSUB
+}
+
+enum Tier {
+  FREE
+  PAID
+}
+
+enum EventType {
+  delivered
+  opened
+  clicked
+}
+
+enum LetterStatus {
+  DRAFT
+  SCHEDULED
+  SENT
+}
