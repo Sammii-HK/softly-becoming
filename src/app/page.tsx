@@ -9,12 +9,15 @@ export default function Home() {
         <p className="mb-8">
           Daily quotes on Instagram. Weekly letters for deeper reflection.
         </p>
-        <div className="flex gap-4">
+        <div className="flex flex-wrap gap-4">
           <a href="/inbox" className="bg-[#3A3A3A] text-[#FAF9F7] px-6 py-3 rounded hover:opacity-90">
             Join the inbox
           </a>
           <a href="/preview" className="border border-[#3A3A3A] px-6 py-3 rounded hover:bg-[#3A3A3A] hover:text-[#FAF9F7]">
             Preview quotes
+          </a>
+          <a href="/shop" className="bg-purple-600 text-white px-6 py-3 rounded hover:bg-purple-700">
+            Digital Products
           </a>
         </div>
       </div>
