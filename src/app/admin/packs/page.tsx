@@ -11,6 +11,7 @@ export default function PacksAdminPage() {
     setResult(null);
     
     try {
+      // Step 1: Generate pack to Vercel Blob
       const response = await fetch('/api/generate/pack-direct', {
         method: 'POST',
         headers: { 
@@ -20,8 +21,61 @@ export default function PacksAdminPage() {
         body: JSON.stringify({ packName, generateAll })
       });
       
-      const data = await response.json();
-      setResult(data);
+      const packData = await response.json();
+      
+      if (packData.success) {
+        // Step 2: Auto-create Stripe products for successful packs
+        const stripeResults = [];
+        
+        for (const pack of packData.results.packs) {
+          if (pack.success && pack.metadata) {
+            try {
+              const stripeResponse = await fetch('/api/stripe/create-product', {
+                method: 'POST',
+                headers: { 
+                  'Content-Type': 'application/json',
+                  'Authorization': `Bearer ${process.env.NEXT_PUBLIC_ADMIN_TOKEN || 'your-admin-token'}`
+                },
+                body: JSON.stringify({
+                  packId: pack.packId,
+                  packName: pack.metadata.packName,
+                  description: pack.metadata.description,
+                  price: pack.metadata.price,
+                  totalImages: pack.metadata.totalImages,
+                  series: pack.metadata.series,
+                  previewImageUrl: pack.previewUrl
+                })
+              });
+              
+              const stripeData = await stripeResponse.json();
+              stripeResults.push({
+                packId: pack.packId,
+                stripeSuccess: stripeData.success,
+                stripePriceId: stripeData.stripePriceId,
+                stripeError: stripeData.error
+              });
+              
+              console.log(`✅ Stripe product created for ${pack.packId}: ${stripeData.stripePriceId}`);
+            } catch (stripeError) {
+              stripeResults.push({
+                packId: pack.packId,
+                stripeSuccess: false,
+                stripeError: stripeError instanceof Error ? stripeError.message : String(stripeError)
+              });
+            }
+          }
+        }
+        
+        // Combine results
+        setResult({
+          ...packData,
+          stripeResults,
+          message: `${packData.message} • Stripe: ${stripeResults.filter(r => r.stripeSuccess).length} created`
+        });
+      } else {
+        setResult(packData);
+      }
+      
     } catch (error) {
       setResult({ 
         success: false, 
@@ -88,13 +142,13 @@ export default function PacksAdminPage() {
         </div>
 
         <div className="bg-blue-50 p-4 rounded text-sm">
-          <h3 className="font-medium mb-2">✨ What happens when you generate:</h3>
+          <h3 className="font-medium mb-2">✨ Complete Automated Workflow:</h3>
           <ul className="space-y-1 text-blue-800">
-            <li>• Creates unique quote images directly in Vercel Blob</li>
-            <li>• Automatically creates Stripe product & price</li>
-            <li>• Updates your shop instantly</li>
-            <li>• No local files created (clean repo!)</li>
-            <li>• Ready for secure customer downloads</li>
+            <li>• <strong>Step 1:</strong> Generate unique quotes & images → Vercel Blob</li>
+            <li>• <strong>Step 2:</strong> Auto-create Stripe product & price</li>
+            <li>• <strong>Step 3:</strong> Shop updates instantly with new products</li>
+            <li>• <strong>Result:</strong> Ready to sell immediately!</li>
+            <li>• <strong>Bonus:</strong> No local files (clean repo!)</li>
           </ul>
         </div>
       </div>
@@ -124,26 +178,55 @@ export default function PacksAdminPage() {
 
               {result.results.packs && (
                 <details className="mt-4">
-                  <summary className="cursor-pointer font-medium">View Pack Details</summary>
+                  <summary className="cursor-pointer font-medium">View Complete Results</summary>
                   <div className="mt-3 space-y-3">
-                    {result.results.packs.map((pack: any, index: number) => (
-                      <div key={index} className={`p-3 rounded text-sm ${
-                        pack.success ? 'bg-green-100' : 'bg-red-100'
-                      }`}>
-                        <div className="font-medium">{pack.packId}</div>
-                        {pack.success ? (
-                          <div className="space-y-1 text-green-700">
-                            <div>📦 Files: {pack.fileCount}</div>
-                            <div>☁️ ZIP: <a href={pack.zipUrl} className="underline" target="_blank">View</a></div>
-                            {pack.previewUrl && (
-                              <div>🖼️ Preview: <a href={pack.previewUrl} className="underline" target="_blank">View</a></div>
-                            )}
-                          </div>
-                        ) : (
-                          <div className="text-red-700">Error: {pack.error}</div>
-                        )}
-                      </div>
-                    ))}
+                    {result.results.packs.map((pack: any, index: number) => {
+                      const stripeResult = result.stripeResults?.find((s: any) => s.packId === pack.packId);
+                      
+                      return (
+                        <div key={index} className={`p-4 rounded border ${
+                          pack.success ? 'bg-green-50 border-green-200' : 'bg-red-50 border-red-200'
+                        }`}>
+                          <div className="font-medium text-lg mb-2">{pack.packId}</div>
+                          
+                          {pack.success ? (
+                            <div className="grid md:grid-cols-2 gap-4 text-sm">
+                              {/* Pack Generation Results */}
+                              <div>
+                                <h4 className="font-medium text-green-700 mb-1">📦 Pack Generation</h4>
+                                <div className="space-y-1 text-green-600">
+                                  <div>✅ Files: {pack.fileCount} images</div>
+                                  <div>✅ ZIP: <a href={pack.zipUrl} className="underline" target="_blank">Blob URL</a></div>
+                                  {pack.previewUrl && (
+                                    <div>✅ Preview: <a href={pack.previewUrl} className="underline" target="_blank">Image</a></div>
+                                  )}
+                                </div>
+                              </div>
+                              
+                              {/* Stripe Results */}
+                              <div>
+                                <h4 className="font-medium text-blue-700 mb-1">💳 Stripe Integration</h4>
+                                {stripeResult ? (
+                                  <div className={`space-y-1 ${stripeResult.stripeSuccess ? 'text-blue-600' : 'text-red-600'}`}>
+                                    <div>{stripeResult.stripeSuccess ? '✅' : '❌'} Product: {stripeResult.stripeSuccess ? 'Created' : 'Failed'}</div>
+                                    {stripeResult.stripePriceId && (
+                                      <div>✅ Price ID: <code className="text-xs bg-gray-100 px-1 rounded">{stripeResult.stripePriceId}</code></div>
+                                    )}
+                                    {stripeResult.stripeError && (
+                                      <div>❌ Error: {stripeResult.stripeError}</div>
+                                    )}
+                                  </div>
+                                ) : (
+                                  <div className="text-gray-500">⏳ Processing...</div>
+                                )}
+                              </div>
+                            </div>
+                          ) : (
+                            <div className="text-red-700">❌ Generation failed: {pack.error}</div>
+                          )}
+                        </div>
+                      );
+                    })}
                   </div>
                 </details>
               )}

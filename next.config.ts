@@ -9,6 +9,23 @@ const nextConfig: NextConfig = {
     // Allow production builds to complete even if there are type errors
     ignoreBuildErrors: false,
   },
+  images: {
+    // Allow query strings in image URLs for OG images
+    localPatterns: [
+      {
+        pathname: '/api/og/**',
+        search: '**',
+      },
+      {
+        pathname: '/api/og-portrait/**',
+        search: '**',
+      },
+      {
+        pathname: '/api/logo/**',
+        search: '**',
+      },
+    ],
+  },
 };
 
 export default nextConfig;

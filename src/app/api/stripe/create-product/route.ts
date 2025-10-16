@@ -50,16 +50,41 @@ export async function POST(req: Request) {
       url: `${process.env.NEXT_PUBLIC_BASE_URL}/shop-dynamic?product=${packId}`
     });
 
-    // Create price for the product
-    const priceObj = await stripe.prices.create({
+    // Create THREE prices for different license tiers
+    const personalPrice = await stripe.prices.create({
       product: product.id,
-      unit_amount: Math.round(price * 100), // Convert to cents
+      unit_amount: Math.round(price * 100), // Base personal price
       currency: 'usd',
+      nickname: 'Personal License',
       metadata: {
         packId,
-        series: series || 'unknown'
+        series: series || 'unknown',
+        tier: 'personal'
       }
-      // One-time payment (recurring is undefined by default)
+    });
+
+    const commercialPrice = await stripe.prices.create({
+      product: product.id,
+      unit_amount: Math.round(price * 1.8 * 100), // +80% for commercial
+      currency: 'usd',
+      nickname: 'Commercial License',
+      metadata: {
+        packId,
+        series: series || 'unknown',
+        tier: 'commercial'
+      }
+    });
+
+    const extendedPrice = await stripe.prices.create({
+      product: product.id,
+      unit_amount: Math.round(price * 2.5 * 100), // +150% for extended
+      currency: 'usd',
+      nickname: 'Extended License',
+      metadata: {
+        packId,
+        series: series || 'unknown',
+        tier: 'extended'
+      }
     });
 
     return NextResponse.json({
@@ -71,13 +96,24 @@ export async function POST(req: Request) {
         images: product.images,
         metadata: product.metadata
       },
-      price: {
-        id: priceObj.id,
-        unit_amount: priceObj.unit_amount,
-        currency: priceObj.currency,
-        formatted: `$${price}`
+      prices: {
+        personal: {
+          id: personalPrice.id,
+          amount: personalPrice.unit_amount,
+          formatted: `$${price}`
+        },
+        commercial: {
+          id: commercialPrice.id,
+          amount: commercialPrice.unit_amount,
+          formatted: `$${Math.round(price * 1.8)}`
+        },
+        extended: {
+          id: extendedPrice.id,
+          amount: extendedPrice.unit_amount,
+          formatted: `$${Math.round(price * 2.5)}`
+        }
       },
-      stripePriceId: priceObj.id, // Use this in your checkout
+      defaultPriceId: personalPrice.id // Default to personal
       message: `Product "${packName}" created successfully in Stripe`
     });
 

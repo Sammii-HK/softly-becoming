@@ -1,11 +1,13 @@
 import { NextResponse } from "next/server";
 import Stripe from "stripe";
 import { PrismaClient } from "@prisma/client";
+
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, { apiVersion: "2023-10-16" });
 const prisma = new PrismaClient();
 
 export async function POST(req: Request) {
   const { email, name } = await req.json();
+  
   // Ensure subscriber exists
   const sub = await prisma.subscriber.upsert({
     where: { email },

@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import ProductCard from './components/ProductCard';
 
 interface ProductPack {
   packId: string;
@@ -150,75 +151,7 @@ export default function DynamicShopPage() {
         {/* Products Grid */}
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8 mb-16">
           {filteredProducts.map((product) => (
-            <div key={product.packId} className="bg-white rounded-lg shadow-sm border border-gray-100 overflow-hidden">
-              {/* Product Preview */}
-              <div className="aspect-square bg-gray-50 relative overflow-hidden">
-                <img 
-                  src={product.previewImage}
-                  alt={`Preview of ${product.packName}`}
-                  className="w-full h-full object-cover"
-                  onError={(e) => {
-                    // Fallback to generated image if file doesn't exist
-                    e.currentTarget.src = `/api/og?text=${encodeURIComponent(product.packName)}`;
-                  }}
-                />
-                <div className="absolute top-4 right-4 bg-white px-3 py-1 rounded-full text-sm font-medium">
-                  {product.totalImages} images
-                </div>
-                <div className="absolute top-4 left-4 bg-black/70 text-white px-2 py-1 rounded text-xs">
-                  {product.series.replace('-', ' ')}
-                </div>
-              </div>
-
-              {/* Product Info */}
-              <div className="p-6">
-                <div className="flex items-start justify-between mb-2">
-                  <h3 className="text-xl font-serif">{product.packName}</h3>
-                  <span className="text-xs bg-gray-100 px-2 py-1 rounded">
-                    v{product.version}
-                  </span>
-                </div>
-                <p className="text-gray-600 mb-4 text-sm">{product.description}</p>
-                
-                {/* Features */}
-                <div className="space-y-1 mb-4 text-xs text-gray-500">
-                  <div className="flex items-center gap-2">
-                    <span className="w-1 h-1 bg-gray-400 rounded-full"></span>
-                    <span>{product.totalImages} high-quality PNG files</span>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <span className="w-1 h-1 bg-gray-400 rounded-full"></span>
-                    <span>Format: {product.format}</span>
-                  </div>
-                  {product.theme && (
-                    <div className="flex items-center gap-2">
-                      <span className="w-1 h-1 bg-gray-400 rounded-full"></span>
-                      <span>Theme: {product.theme.replace('_', ' ')}</span>
-                    </div>
-                  )}
-                  <div className="flex items-center gap-2">
-                    <span className="w-1 h-1 bg-gray-400 rounded-full"></span>
-                    <span>Commercial use included</span>
-                  </div>
-                </div>
-
-                {/* Price & Purchase */}
-                <div className="flex items-center justify-between">
-                  <div className="text-2xl font-serif">${product.price}</div>
-                  <button
-                    onClick={() => handlePurchase(product)}
-                    disabled={purchaseLoading === product.packId}
-                    className="bg-[#3A3A3A] text-[#FAF9F7] px-4 py-2 rounded text-sm hover:opacity-90 disabled:opacity-50 transition-opacity"
-                  >
-                    {purchaseLoading === product.packId ? 'Processing...' : 'Buy Now'}
-                  </button>
-                </div>
-
-                <div className="text-xs text-gray-400 mt-2">
-                  Created {new Date(product.generatedAt).toLocaleDateString()}
-                </div>
-              </div>
-            </div>
+            <ProductCard key={product.packId} product={product} />
           ))}
         </div>
 

@@ -158,7 +158,7 @@ async function generateProductPack(config: PackConfig, version?: number): Promis
   }
 }
 
-// Predefined pack configurations - now with series and pricing!
+// Competitive base pricing - optimized for volume sales!
 const PACK_CONFIGS: PackConfig[] = [
   {
     name: 'soft-strength-collection',
@@ -167,7 +167,7 @@ const PACK_CONFIGS: PackConfig[] = [
     seed: 12345,
     theme: 'soft_strength',
     format: 'both',
-    price: 29,
+    price: 19, // Competitive base price (was $29)
     description: 'Beautiful quotes about finding strength in gentleness. Both square and portrait formats included.'
   },
   {
@@ -177,7 +177,7 @@ const PACK_CONFIGS: PackConfig[] = [
     seed: 54321,
     theme: 'rebuilding',
     format: 'square',
-    price: 24,
+    price: 16, // Competitive base price (was $24)
     description: 'Inspiring quotes for women starting over and rebuilding their lives with intention.'
   },
   {
@@ -187,7 +187,7 @@ const PACK_CONFIGS: PackConfig[] = [
     seed: 98765,
     theme: 'self_trust',
     format: 'portrait',
-    price: 34,
+    price: 22, // Competitive base price (was $34)
     description: 'Powerful quotes about trusting yourself and your inner wisdom. Perfect for Instagram stories.'
   },
   {
@@ -196,10 +196,9 @@ const PACK_CONFIGS: PackConfig[] = [
     count: 50,
     seed: 11111,
     format: 'both',
-    price: 67,
+    price: 39, // Competitive base price (was $67)
     description: 'Our largest collection with all themes and formats. The ultimate digital quote library.'
   },
-  // NEW SERIES IDEAS - Add more themes!
   {
     name: 'gentle-boundaries',
     series: 'boundaries',
@@ -207,7 +206,7 @@ const PACK_CONFIGS: PackConfig[] = [
     seed: 22222,
     theme: 'letting_go',
     format: 'both',
-    price: 27,
+    price: 18, // Competitive base price (was $27)
     description: 'Learn to set boundaries with kindness. Perfect for people-pleasers learning to say no.'
   },
   {
@@ -217,7 +216,7 @@ const PACK_CONFIGS: PackConfig[] = [
     seed: 33333,
     theme: 'becoming',
     format: 'square',
-    price: 22,
+    price: 14, // Competitive base price (was $22)
     description: 'Start your day with gentle affirmations. Perfect for morning routines and self-care.'
   }
 ];

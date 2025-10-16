@@ -31,15 +31,14 @@ export async function GET(req: NextRequest) {
         padding: 160 // More breathing room for portrait
       }}>
         <div style={{
-          fontFamily: "serif", 
-          fontSize: 64, // Smaller for portrait, more elegant
+          fontFamily: "ui-serif, Georgia, Cambria, serif",
+          fontSize: 52,
           lineHeight: 1.4, 
           letterSpacing: "-0.005em",
           whiteSpace: "pre-wrap", 
-          maxWidth: 600, // Shorter lines to avoid orphaned words
-          textAlign: "left", // Back to left-aligned as requested
-          fontWeight: "400",
-          // Prevent orphaned words
+          maxWidth: 600,
+          textAlign: "center",
+          fontWeight: "300",
           orphans: 2,
           widows: 2,
           wordSpacing: "0.1em"
