@@ -1,5 +1,5 @@
 import { generateQuotes } from "@/lib/generator/builder";
-import { postToAyrshare } from "@/lib/scheduler/ayrshare";
+import { postToSucculent } from "@/lib/scheduler/succulent";
 import { markPosted, hasPosted } from "@/lib/state/store";
 import { createHash } from "node:crypto";
 import { guardQuote } from "@/lib/quality/contentGuard";
@@ -27,7 +27,17 @@ export async function postOne(opts: { seed?: number; weekday?: number }) {
 
     const caption = buildCaption(guarded.lines[0]);
 
-    const result = await postToAyrshare({ caption, mediaUrls: [imageUrl] });
+    const result = await postToSucculent({ 
+      content: caption, 
+      imageUrl,
+      title: `${q.theme} - ${q.tone} quote`
+    });
+    
+    if (!result.success) {
+      console.error("Failed to post to Succulent Social:", result.error);
+      continue; // Try next quote
+    }
+
     await markPosted(hash);
     await logPost({ ts: Date.now(), hash, theme: q.theme, tone: q.tone, structure: q.structure });
 
