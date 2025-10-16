@@ -3,7 +3,7 @@ generator client {
 }
 
 datasource db {
-  provider = "postgresql"
+  provider = "sqlite"
   url      = env("DATABASE_URL")
 }
 
@@ -11,8 +11,8 @@ model Subscriber {
   id           String       @id @default(cuid())
   email        String       @unique
   name         String?
-  status       Status       @default(ACTIVE)
-  tier         Tier         @default(FREE)
+  status       String       @default("ACTIVE")  // "ACTIVE", "BOUNCED", "UNSUB"
+  tier         String       @default("FREE")    // "FREE", "PAID"
   source       String?
   stripeId     String?
   createdAt    DateTime     @default(now())
@@ -25,45 +25,22 @@ model EmailEvent {
   subscriber   Subscriber @relation(fields: [subscriberId], references: [id])
   subscriberId String
   messageId    String?
-  type         EventType
+  type         String     // "delivered", "opened", "clicked"
   ts           DateTime   @default(now())
-  meta         Json?
+  meta         String?    // JSON as string
 }
 
 model Letter {
-  id         String       @id @default(cuid())
-  slug       String       @unique
+  id         String    @id @default(cuid())
+  slug       String    @unique
   subject    String
   theme      String
   lineToKeep String
-  bodyJson   Json
+  bodyJson   String    // JSON as string
   bodyHtml   String
   bodyText   String
-  status     LetterStatus @default(DRAFT)
+  status     String    @default("DRAFT")  // "DRAFT", "SCHEDULED", "SENT"
   sendAt     DateTime?
-  createdAt  DateTime     @default(now())
-  updatedAt  DateTime     @updatedAt
-}
-
-enum Status {
-  ACTIVE
-  BOUNCED
-  UNSUB
-}
-
-enum Tier {
-  FREE
-  PAID
-}
-
-enum EventType {
-  delivered
-  opened
-  clicked
-}
-
-enum LetterStatus {
-  DRAFT
-  SCHEDULED
-  SENT
+  createdAt  DateTime  @default(now())
+  updatedAt  DateTime  @updatedAt
 }

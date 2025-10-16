@@ -3,9 +3,9 @@ import { z } from "zod";
 import { Resend } from "resend";
 import { PrismaClient } from "@prisma/client";
 const prisma = new PrismaClient();
-const resend = new Resend(process.env.RESEND_API_KEY!);
 
 export async function POST(req: Request) {
+
   const form = await req.formData();
   const schema = z.object({
     email: z.string().email(),
@@ -29,6 +29,7 @@ export async function POST(req: Request) {
   }
 
   // Send immediate welcome
+  const resend = new Resend(process.env.RESEND_API_KEY!);
   await resend.emails.send({
     from: process.env.EMAIL_FROM!,
     to: email,

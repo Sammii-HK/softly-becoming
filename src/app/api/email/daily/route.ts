@@ -6,7 +6,6 @@ import { guardQuote } from "@/lib/quality/contentGuard";
 import { assertInternal } from "@/lib/auth/internal";
 
 const prisma = new PrismaClient();
-const resend = new Resend(process.env.RESEND_API_KEY!);
 // Note: Using Node.js runtime because Prisma Client requires Node.js APIs
 // export const runtime = "edge";
 
@@ -30,17 +29,27 @@ export async function GET(req: Request) {
     </div>`;
 
   // Send in batches to avoid rate limits
+  if (!process.env.RESEND_API_KEY) {
+    return NextResponse.json({ error: "Email service not configured" }, { status: 500 });
+  }
+
+  const resend = new Resend(process.env.RESEND_API_KEY);
   const chunk = 800;
   let sent = 0;
   for (let i = 0; i < subs.length; i += chunk) {
     const slice = subs.slice(i, i + chunk).map(s => s.email);
-    await resend.emails.send({
-      from: process.env.EMAIL_FROM!,
-      to: slice,
-      subject: "today's note — soft rebuild",
-      html,
-    });
-    sent += slice.length;
+    try {
+      await resend.emails.send({
+        from: process.env.EMAIL_FROM!,
+        to: slice,
+        subject: "today's note — soft rebuild",
+        html,
+      });
+      sent += slice.length;
+    } catch (error) {
+      console.error(`Failed to send batch ${i}-${i + chunk}:`, error);
+      // Continue with other batches
+    }
   }
   return NextResponse.json({ ok: true, sent });
 }

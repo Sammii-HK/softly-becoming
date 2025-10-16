@@ -3,10 +3,10 @@ import { PrismaClient } from "@prisma/client";
 import { Resend } from "resend";
 import { assertAdmin } from "@/lib/auth/internal";
 const prisma = new PrismaClient();
-const resend = new Resend(process.env.RESEND_API_KEY!);
 
 export async function POST(req: Request) {
   try { assertAdmin(req); } catch { return NextResponse.json({ error: "unauthorised" }, { status: 401 }); }
+
   const { id } = await req.json();
   if (!id) return NextResponse.json({ error: "id required" }, { status: 400 });
 
@@ -18,6 +18,7 @@ export async function POST(req: Request) {
     select: { email: true }
   });
 
+  const resend = new Resend(process.env.RESEND_API_KEY || "");
   const chunk = 800;
   for (let i = 0; i < subs.length; i += chunk) {
     const to = subs.slice(i, i + chunk).map(s => s.email);
