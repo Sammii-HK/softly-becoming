@@ -9,126 +9,126 @@ export const runtime = "edge";
 // const FONT = fetch(new URL("/public/fonts/PlayfairDisplay-Regular.ttf", import.meta.url))
 //   .then(res => res.arrayBuffer());
 
-// Load Google Font function (from Vercel guide)
-async function loadGoogleFont(font: string, text: string) {
-  const url = `https://fonts.googleapis.com/css2?family=${font}&text=${encodeURIComponent(text)}`;
-  const css = await (await fetch(url)).text();
-  const resource = css.match(/src: url\((.+)\) format\('(opentype|truetype)'\)/);
- 
-  if (resource) {
-    const response = await fetch(resource[1]);
-    if (response.status == 200) {
-      return await response.arrayBuffer();
-    }
-  }
- 
-  throw new Error('failed to load font data');
-}
-
 export async function GET(req: NextRequest) {
   const { searchParams } = new URL(req.url);
   const rawText = searchParams.get("text") ?? "soft rebuild";
   const showBranding = searchParams.get("branding") === "true";
-  const capitalizedText = capitalizeI(rawText);
-  const spacedText = enhanceParagraphSpacing(capitalizedText);
-  const text = preventOrphanedWords(spacedText);
-  const colors = getColorForText(rawText);
   
-  // Load custom font - try serif font that should work better
-  let fontData;
   try {
-    fontData = await loadGoogleFont('Crimson+Text:wght@400;600', text);
-  } catch (error) {
-    console.log('Font loading failed, using system font');
-    fontData = null;
-  }
-  
-  // Split text to highlight the last line like your example
-  const lines = text.split('\n').filter(line => line.trim());
-  const mainText = lines.slice(0, -1).join('\n');
-  const highlightText = lines[lines.length - 1] || '';
-
-  return new ImageResponse(
-    (
-      <div 
-        style={{
-          width: "1080px",
-          height: "1080px",
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-          padding: "120px",
-          background: colors.bg,
-          color: colors.text,
-          position: "relative",
-          flexDirection: "column",
-          gap: "16px"
-        }}
-      >
-        {/* Main text */}
-        {mainText && (
-          <div
-            style={{
-              fontFamily: fontData ? "Crimson Text" : "ui-serif, Georgia, serif",
-              fontWeight: "400",
-              fontSize: 50,
-              lineHeight: 1.3,
-              textAlign: "center",
-              maxWidth: "700px",
-              whiteSpace: "pre-wrap"
-            }}
-          >
-            {mainText}
-          </div>
-        )}
-        
-        {/* Highlighted last line - exactly like your example */}
-        {highlightText && (
-          <div
-            style={{
-              fontFamily: fontData ? "Crimson Text" : "ui-serif, Georgia, serif",
-              fontWeight: "600",
-              fontSize: 50,
-              lineHeight: 1.3,
-              textAlign: "center",
-              maxWidth: "700px",
-              fontStyle: "italic",
-              color: colors.highlight, // Saturated highlight color
-              padding: "8px 0"
-            }}
-          >
-            {highlightText}
-          </div>
-        )}
-        
-        {/* Subtle branding */}
-        {showBranding && (
-          <div style={{
-            position: "absolute",
-            bottom: "40px",
-            right: "40px",
-            fontSize: "16px",
-            opacity: 0.3,
-            fontFamily: "Inter",
-            fontStyle: "italic"
-          }}>
-            softly becoming
-          </div>
-        )}
-      </div>
-    ),
-    {
-      width: 1080,
-      height: 1080,
-      ...(fontData && {
-        fonts: [
-          {
-            name: 'Crimson Text',
-            data: fontData,
-            style: 'normal',
-          },
-        ],
-      }),
+    // Ultra-simple, bulletproof approach
+    const colors = getColorForText(rawText);
+    
+    // Clean text - remove any problematic characters
+    const cleanText = rawText.replace(/[^\w\s\n.,'!?-]/g, '');
+    
+    // Split into lines, but handle safely
+    const allLines = cleanText.split('\n').map(line => line.trim()).filter(Boolean);
+    
+    // Always ensure we have content
+    if (allLines.length === 0) {
+      allLines.push("gentle wisdom");
     }
-  );
+    
+    // Format text for display
+    const mainLines = allLines.slice(0, -1);
+    const lastLine = allLines[allLines.length - 1] || "";
+
+    return new ImageResponse(
+      (
+        <div 
+          style={{
+            width: 1080,
+            height: 1080,
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            padding: 120,
+            background: colors.bg,
+            color: colors.text,
+            position: "relative"
+          }}
+        >
+          <div
+            style={{
+              fontFamily: "serif",
+              fontSize: 48,
+              lineHeight: 1.4,
+              textAlign: "left",
+              maxWidth: 600,
+              fontWeight: "400",
+              display: "flex", // CRITICAL: Required for multiple children
+              flexDirection: "column"
+            }}
+          >
+            {/* Render each line as a separate div */}
+            {allLines.map((line, index) => (
+              <div
+                key={index}
+                style={{
+                  marginBottom: index < allLines.length - 1 ? "16px" : "0",
+                  ...(index === allLines.length - 1 ? {
+                    fontWeight: "600",
+                    fontStyle: "italic",
+                    color: colors.highlight
+                  } : {})
+                }}
+              >
+                {line}
+              </div>
+            ))}
+          </div>
+          
+          {/* Branding */}
+          {showBranding && (
+            <div style={{
+              position: "absolute",
+              bottom: 40,
+              right: 40,
+              fontSize: 16,
+              opacity: 0.3,
+              fontFamily: "serif"
+            }}>
+              softly becoming
+            </div>
+          )}
+        </div>
+      ),
+      {
+        width: 1080,
+        height: 1080
+      }
+    );
+  } catch (error) {
+    console.error('OG fallback for:', rawText, error);
+    
+    // Ultimate fallback - guaranteed to work
+    return new ImageResponse(
+      (
+        <div 
+          style={{
+            width: 1080,
+            height: 1080,
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            background: "#FEFDFF",
+            color: "#2A0A3A",
+            padding: 120
+          }}
+        >
+          <div
+            style={{
+              fontFamily: "serif",
+              fontSize: 48,
+              textAlign: "left",
+              maxWidth: 600
+            }}
+          >
+            gentle wisdom
+          </div>
+        </div>
+      ),
+      { width: 1080, height: 1080 }
+    );
+  }
 }

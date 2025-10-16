@@ -112,10 +112,10 @@ export default function DynamicShopPage() {
         <div className="text-center mb-12">
           <h1 className="text-5xl font-serif mb-6">Digital Quote Collections</h1>
           <p className="text-xl opacity-80 mb-4 max-w-3xl mx-auto">
-            Beautiful, ready-to-use quote graphics for your social media, website, or personal inspiration.
+            beautiful, ready-to-use quote graphics for your social media, website, or personal inspiration.
           </p>
           <p className="opacity-70 mb-8">
-            {shopData.totalProducts} products across {shopData.totalSeries} series • Instant download • Commercial use included
+            {shopData.totalProducts} products across {shopData.totalSeries} series • instant download • flexible licensing
           </p>
         </div>
 
@@ -157,16 +157,16 @@ export default function DynamicShopPage() {
 
         {/* Generate More CTA */}
         <div className="text-center bg-white rounded-lg border border-gray-100 p-8">
-          <h2 className="text-2xl font-serif mb-4">Want More Collections?</h2>
+          <h2 className="text-2xl font-light mb-4">want more collections?</h2>
           <p className="text-gray-600 mb-6">
-            We're constantly creating new quote collections. Each pack is unique and generated fresh!
+            we're constantly creating new quote collections. each pack is unique and generated fresh.
           </p>
           <div className="flex gap-4 justify-center">
-            <a href="/inbox" className="bg-[#3A3A3A] text-[#FAF9F7] px-6 py-3 rounded hover:opacity-90">
-              Get Notified of New Packs
+            <a href="/inbox" className="bg-gray-900 text-white px-6 py-3 rounded-lg hover:bg-gray-800 transition-colors">
+              get notified of new packs
             </a>
-            <a href="/" className="border border-[#3A3A3A] px-6 py-3 rounded hover:bg-[#3A3A3A] hover:text-[#FAF9F7]">
-              Back to Home
+            <a href="/" className="border border-gray-300 px-6 py-3 rounded-lg hover:bg-gray-50 transition-colors">
+              back to home
             </a>
           </div>
         </div>

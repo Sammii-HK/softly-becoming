@@ -20,7 +20,8 @@ interface PackUploadResult {
 export async function uploadPackToBlob(
   packPath: string, 
   packId: string, 
-  series: string
+  series: string,
+  licenseType: string = 'commercial'
 ): Promise<PackUploadResult> {
   try {
     console.log(`📤 Uploading ${packId} to Vercel Blob...`);
@@ -47,7 +48,7 @@ export async function uploadPackToBlob(
     const packInfo = readFileSync(packInfoPath, 'utf8');
     zip.file('pack-info.json', packInfo);
     
-    const license = createLicenseText(packId);
+    const license = createLicenseText(packId, licenseType);
     zip.file('LICENSE.txt', license);
     
     // Generate ZIP buffer
@@ -152,33 +153,78 @@ export async function deletePackFromBlob(packId: string, series: string): Promis
   }
 }
 
-function createLicenseText(packId: string): string {
+function createLicenseText(packId: string, licenseType: string = 'commercial'): string {
+  const licenseDescriptions = {
+    personal: {
+      title: 'PERSONAL LICENCE',
+      description: 'for your own use (phone, prints for self). no resale.',
+      permissions: [
+        '✅ personal social media accounts',
+        '✅ personal prints and wallpapers', 
+        '✅ personal inspiration and motivation'
+      ],
+      restrictions: [
+        '❌ no commercial use',
+        '❌ no client work',
+        '❌ no resale or redistribution'
+      ]
+    },
+    commercial: {
+      title: 'COMMERCIAL LICENCE',
+      description: 'for client or small business use, up to 5,000 uses.',
+      permissions: [
+        '✅ business social media and marketing',
+        '✅ client work and projects',
+        '✅ website and blog graphics',
+        '✅ print products (up to 5,000 copies)',
+        '✅ include in presentations and courses'
+      ],
+      restrictions: [
+        '❌ cannot resell as standalone quote packs',
+        '❌ cannot exceed 5,000 total usage limit',
+        '❌ cannot sublicense to others'
+      ]
+    },
+    extended: {
+      title: 'EXTENDED LICENCE',
+      description: 'unlimited commercial projects and resale rights.',
+      permissions: [
+        '✅ unlimited commercial usage',
+        '✅ resale as part of physical products',
+        '✅ include in digital courses and products',
+        '✅ unlimited print runs and merchandise',
+        '✅ apps, software, and digital platforms'
+      ],
+      restrictions: [
+        '❌ cannot resell as standalone quote packs',
+        '❌ cannot claim original authorship'
+      ]
+    }
+  };
+
+  const license = licenseDescriptions[licenseType as keyof typeof licenseDescriptions] || licenseDescriptions.commercial;
+
   return `
-Digital Quote Pack License
+${license.title}
 
-Product: ${packId}
-Downloaded: ${new Date().toISOString()}
-Provider: Soft Rebuild (softly-becoming.vercel.app)
+softly becoming digital image pack
+product: ${packId}
+downloaded: ${new Date().toLocaleDateString('en-GB')}
 
-COMMERCIAL USE INCLUDED:
-✅ Use for social media posts and stories
-✅ Use for client work and projects
-✅ Use for website and blog graphics  
-✅ Print for physical products and merchandise
-✅ Include in larger digital packages or courses
+---
 
-RESTRICTIONS:
-❌ Cannot resell as standalone quote packs
-❌ Cannot claim as your own original work
-❌ Cannot redistribute the source files
-❌ Cannot use for competing quote businesses
+what you can do:
+${license.permissions.join('\n')}
 
-ATTRIBUTION (Optional but Appreciated):
-"Quotes from Soft Rebuild" or link to softly-becoming.vercel.app
+what you cannot do:
+${license.restrictions.join('\n')}
 
-For questions or commercial licensing inquiries:
-hello@softrebuild.com
+---
 
-Thank you for supporting gentle, authentic content creation! 🌸
+${licenseType !== 'extended' ? 'this licence can be upgraded any time by paying the difference only.' : 'this extended licence provides maximum flexibility for commercial use.'}
+
+questions? reply to your purchase email.
+
+© softly becoming. all rights reserved.
 `;
 }

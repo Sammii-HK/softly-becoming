@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { BASE_PACK_PRICES, LICENSE_TIERS } from '@/lib/pricing/strategy';
+import { getBasePriceInCents, formatPriceFromCents, getDefaultCurrency, type LicenseTier, type Currency } from '@/lib/pricing/getPrices';
 
 interface ProductPack {
   packId: string;
@@ -18,28 +18,28 @@ interface ProductCardProps {
 }
 
 export default function ProductCard({ product }: ProductCardProps) {
-  const [selectedTier, setSelectedTier] = useState<'personal' | 'commercial' | 'extended'>('personal');
+  const [selectedTier, setSelectedTier] = useState<LicenseTier>('commercial');
   const [loading, setLoading] = useState(false);
+  const currency = getDefaultCurrency();
 
-  // Get pricing for this product
-  const pricing = BASE_PACK_PRICES[product.packId as keyof typeof BASE_PACK_PRICES] || {
-    personal: 19,
-    commercial: 34,
-    extended: 47
+  // Get pricing for each tier (in pence/cents)
+  const prices = {
+    personal: getBasePriceInCents(product.totalImages, 'personal'),
+    commercial: getBasePriceInCents(product.totalImages, 'commercial'),
+    extended: getBasePriceInCents(product.totalImages, 'extended')
   };
 
   const handlePurchase = async () => {
     setLoading(true);
     
     try {
-      const response = await fetch('/api/checkout/product-tier', {
+      const response = await fetch('/api/checkout', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           productId: product.packId,
-          tier: selectedTier,
-          productName: product.packName,
-          customPrice: pricing[selectedTier]
+          license: selectedTier,
+          currency
         })
       });
       
@@ -85,50 +85,55 @@ export default function ProductCard({ product }: ProductCardProps) {
         
         {/* License Tier Selection */}
         <div className="mb-6">
-          <h4 className="font-medium mb-3">Choose Your License:</h4>
+          <h4 className="font-medium mb-3 text-sm">choose your licence:</h4>
           <div className="space-y-2">
             {(['personal', 'commercial', 'extended'] as const).map((tier) => (
-              <label key={tier} className="flex items-center justify-between p-3 border rounded-lg cursor-pointer hover:bg-gray-50">
+              <label key={tier} className={`flex items-center justify-between p-3 border-2 rounded-lg cursor-pointer transition-all ${
+                selectedTier === tier 
+                  ? 'border-gray-900 bg-gray-50' 
+                  : 'border-gray-200 hover:border-gray-300'
+              }`}>
                 <div className="flex items-center gap-3">
                   <input
                     type="radio"
                     name={`tier-${product.packId}`}
                     value={tier}
                     checked={selectedTier === tier}
-                    onChange={(e) => setSelectedTier(e.target.value as any)}
-                    className="text-purple-600"
+                    onChange={(e) => setSelectedTier(e.target.value as LicenseTier)}
+                    className="sr-only"
                   />
+                  <div className={`w-4 h-4 rounded-full border-2 transition-all ${
+                    selectedTier === tier 
+                      ? 'border-gray-900 bg-gray-900' 
+                      : 'border-gray-300'
+                  }`}>
+                    {selectedTier === tier && (
+                      <div className="w-full h-full flex items-center justify-center">
+                        <div className="w-1.5 h-1.5 bg-white rounded-full" />
+                      </div>
+                    )}
+                  </div>
                   <div>
-                    <div className="font-medium text-sm">
-                      {LICENSE_TIERS[tier].name}
+                    <div className="font-medium text-sm capitalize">
+                      {tier}
+                      {tier === 'commercial' && (
+                        <span className="ml-2 text-xs px-2 py-0.5 bg-gray-900 text-white rounded-full">
+                          most popular
+                        </span>
+                      )}
                     </div>
-                    <div className="text-xs text-gray-500">
-                      {LICENSE_TIERS[tier].description}
+                    <div className="text-xs text-gray-600">
+                      {tier === 'personal' && 'for your own use only'}
+                      {tier === 'commercial' && 'for client work, up to 5,000 uses'}
+                      {tier === 'extended' && 'unlimited commercial rights'}
                     </div>
                   </div>
                 </div>
-                <div className="text-lg font-serif">
-                  ${pricing[tier]}
+                <div className="text-lg font-light">
+                  {formatPriceFromCents(prices[tier], currency)}
                 </div>
               </label>
             ))}
-          </div>
-        </div>
-
-        {/* Selected License Details */}
-        <div className="mb-6 p-3 bg-gray-50 rounded-lg">
-          <h5 className="font-medium text-sm mb-2">What's included:</h5>
-          <div className="space-y-1">
-            {LICENSE_TIERS[selectedTier].includes.slice(0, 4).map((item, index) => (
-              <div key={index} className="text-xs text-gray-600">
-                {item}
-              </div>
-            ))}
-            {LICENSE_TIERS[selectedTier].includes.length > 4 && (
-              <div className="text-xs text-gray-500">
-                +{LICENSE_TIERS[selectedTier].includes.length - 4} more...
-              </div>
-            )}
           </div>
         </div>
 
@@ -136,13 +141,13 @@ export default function ProductCard({ product }: ProductCardProps) {
         <button
           onClick={handlePurchase}
           disabled={loading}
-          className="w-full bg-[#3A3A3A] text-[#FAF9F7] py-3 px-4 rounded hover:opacity-90 disabled:opacity-50 transition-opacity"
+          className="w-full bg-gray-900 text-white py-4 px-4 rounded-lg font-medium hover:bg-gray-800 disabled:opacity-50 transition-all"
         >
-          {loading ? 'Processing...' : `Buy ${LICENSE_TIERS[selectedTier].name} - $${pricing[selectedTier]}`}
+          {loading ? 'processing...' : 'get the pack'}
         </button>
 
-        <div className="text-xs text-gray-400 mt-3 text-center">
-          Instant download • 30-day money-back guarantee
+        <div className="text-xs text-gray-500 mt-3 text-center">
+          instant download. licence included.
         </div>
       </div>
     </div>

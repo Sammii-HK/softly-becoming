@@ -113,7 +113,7 @@ export async function POST(req: Request) {
           formatted: `$${Math.round(price * 2.5)}`
         }
       },
-      defaultPriceId: personalPrice.id // Default to personal
+      defaultPriceId: personalPrice.id, // Default to personal
       message: `Product "${packName}" created successfully in Stripe`
     });
 

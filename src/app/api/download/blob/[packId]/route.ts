@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { list } from '@vercel/blob';
 import Stripe from "stripe";
+import JSZip from 'jszip';
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, { apiVersion: "2023-10-16" });
 
@@ -21,9 +22,10 @@ export async function GET(
   }
 
   try {
-    // Verify authorization
+    // Verify authorization and get license info
     let isAuthorized = false;
     let customerEmail = "";
+    let licenseType = "commercial"; // default
 
     if (sessionId) {
       // Verify Stripe session
@@ -33,6 +35,7 @@ export async function GET(
           session.payment_status === "paid") {
         isAuthorized = true;
         customerEmail = session.customer_details?.email || "";
+        licenseType = session.metadata?.license || "commercial";
       }
     } else if (token) {
       // Verify secure token
@@ -64,10 +67,33 @@ export async function GET(
     }
 
     // Log download for analytics
-    console.log(`📦 Blob download: ${packId} by ${customerEmail}`);
+    console.log(`📦 Blob download: ${packId} (${licenseType}) by ${customerEmail}`);
 
-    // Redirect to the blob URL (Vercel handles the actual file serving)
-    return NextResponse.redirect(packBlob.url);
+    // Fetch the original ZIP and modify it with the correct license
+    const response = await fetch(packBlob.url);
+    const originalZipBuffer = await response.arrayBuffer();
+    
+    // Load the original ZIP
+    const zip = new JSZip();
+    await zip.loadAsync(originalZipBuffer);
+    
+    // Replace the license file with the correct tier
+    const licenseContent = createLicenseText(packId, licenseType, customerEmail);
+    zip.file('LICENSE.txt', licenseContent);
+    
+    // Generate the modified ZIP
+    const modifiedZipBuffer = await zip.generateAsync({ type: 'nodebuffer' });
+    
+    // Return the modified ZIP with correct license
+    return new NextResponse(new Uint8Array(modifiedZipBuffer), {
+      headers: {
+        "Content-Type": "application/zip",
+        "Content-Disposition": `attachment; filename="${packId}-${licenseType}.zip"`,
+        "Cache-Control": "no-cache, no-store, must-revalidate",
+        "Pragma": "no-cache",
+        "Expires": "0"
+      }
+    });
 
   } catch (error) {
     console.error("Blob download error:", error);
@@ -100,4 +126,80 @@ function verifySecureToken(token: string, packId: string): boolean {
     console.error('Token verification failed:', error);
     return false;
   }
+}
+
+function createLicenseText(packId: string, licenseType: string, customerEmail: string): string {
+  const licenseDescriptions = {
+    personal: {
+      title: 'PERSONAL LICENCE',
+      description: 'for your own use (phone, prints for self). no resale.',
+      permissions: [
+        '• personal social media accounts',
+        '• personal prints and wallpapers', 
+        '• personal inspiration and motivation'
+      ],
+      restrictions: [
+        '• no commercial use',
+        '• no client work',
+        '• no resale or redistribution'
+      ]
+    },
+    commercial: {
+      title: 'COMMERCIAL LICENCE',
+      description: 'for client or small business use, up to 5,000 uses.',
+      permissions: [
+        '• business social media and marketing',
+        '• client work and projects',
+        '• website and blog graphics',
+        '• print products (up to 5,000 copies)',
+        '• include in presentations and courses'
+      ],
+      restrictions: [
+        '• cannot resell as standalone quote packs',
+        '• cannot exceed 5,000 total usage limit',
+        '• cannot sublicense to others'
+      ]
+    },
+    extended: {
+      title: 'EXTENDED LICENCE',
+      description: 'unlimited commercial projects and resale rights.',
+      permissions: [
+        '• unlimited commercial usage',
+        '• resale as part of physical products',
+        '• include in digital courses and products',
+        '• unlimited print runs and merchandise',
+        '• apps, software, and digital platforms'
+      ],
+      restrictions: [
+        '• cannot resell as standalone quote packs',
+        '• cannot claim original authorship'
+      ]
+    }
+  };
+
+  const license = licenseDescriptions[licenseType as keyof typeof licenseDescriptions] || licenseDescriptions.commercial;
+
+  return `${license.title}
+
+softly becoming digital image pack
+product: ${packId}
+purchased by: ${customerEmail}
+downloaded: ${new Date().toLocaleDateString('en-GB')}
+
+---
+
+what you can do:
+${license.permissions.join('\n')}
+
+what you cannot do:
+${license.restrictions.join('\n')}
+
+---
+
+${licenseType !== 'extended' ? 'this licence can be upgraded any time by paying the difference only.' : 'this extended licence provides maximum flexibility for commercial use.'}
+
+questions? reply to your purchase email.
+
+© softly becoming. all rights reserved.
+`;
 }

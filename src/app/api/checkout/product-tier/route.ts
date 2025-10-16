@@ -48,7 +48,6 @@ export async function POST(req: Request) {
         },
         product_data: {
           name: `${productName} (${tier.charAt(0).toUpperCase() + tier.slice(1)} License)`,
-          description: getLicenseDescription(tier),
           metadata: {
             productId,
             tier,
