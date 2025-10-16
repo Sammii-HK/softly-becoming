@@ -1,6 +1,6 @@
 import { ImageResponse } from "@vercel/og";
 import { NextRequest } from "next/server";
-import { baseStyle, textStyle, getColorForText } from "@/lib/render/og-style";
+import { baseStyle, textStyle, getColorForText, preventOrphanedWords, enhanceParagraphSpacing, capitalizeI } from "@/lib/render/og-style";
 import React from "react";
 
 export const runtime = "edge";
@@ -11,8 +11,11 @@ export const runtime = "edge";
 
 export async function GET(req: NextRequest) {
   const { searchParams } = new URL(req.url);
-  const text = searchParams.get("text") ?? "soft rebuild";
-  const colors = getColorForText(text);
+  const rawText = searchParams.get("text") ?? "soft rebuild";
+  const capitalizedText = capitalizeI(rawText);
+  const spacedText = enhanceParagraphSpacing(capitalizedText);
+  const text = preventOrphanedWords(spacedText);
+  const colors = getColorForText(rawText);
   // const fontData = await FONT;
 
   return new ImageResponse(

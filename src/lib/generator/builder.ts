@@ -8,7 +8,7 @@ import {
 import { mulberry32, pick, pickWeighted } from "./rng";
 
 export const THEMES: Theme[] = ["rebuilding", "soft_strength", "self_trust", "letting_go", "becoming"];
-export const STRUCTURES: Structure[] = ["three_line", "affirmation", "letter", "internal", "two_line"];
+export const STRUCTURES: Structure[] = ["three_line", "affirmation", "internal", "two_line"];
 
 export const WEIGHTS: Record<Tone, number> = {
   honest: 0.4,
@@ -97,13 +97,6 @@ function buildLines(structure: Structure, rand: () => number, theme: Theme): str
       return [pick(rand, truths) + ".", pick(rand, resolves) + "."];
     case "affirmation":
       return [pick(rand, affirmA) + ".", pick(rand, affirmB) + "."];
-    case "letter":
-      return [
-        `to ${pick(rand, versions)},`,
-        pick(rand, messages) + ".",
-        "love,",
-        "me.",
-      ];
     case "internal":
       return [pick(rand, internalTruths) + ",", pick(rand, internalRealise) + "."];
   }

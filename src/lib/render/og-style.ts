@@ -38,6 +38,41 @@ export function getColorForText(text: string) {
   return PASTEL_COLORS[hash % PASTEL_COLORS.length];
 }
 
+// Prevent orphaned words by adding non-breaking spaces
+export function preventOrphanedWords(text: string): string {
+  // Split into lines first to preserve intentional line breaks
+  const lines = text.split('\n');
+  
+  return lines.map(line => {
+    if (!line.trim()) return line;
+    
+    // Split the line into words
+    const words = line.trim().split(/\s+/);
+    
+    // If less than 3 words, no orphan possible
+    if (words.length < 3) return line;
+    
+    // Replace the space before the last word with a non-breaking space
+    // This keeps the last two words together
+    const result = words.slice(0, -2).join(' ') + ' ' + words.slice(-2).join('\u00A0');
+    
+    return result;
+  }).join('\n');
+}
+
+// Add moderate spacing between paragraphs while preserving line breaks
+export function enhanceParagraphSpacing(text: string): string {
+  // Add a single space between newlines for subtle paragraph separation
+  // This creates a middle ground between too tight and too loose
+  return text.replace(/\n/g, '\n \n');
+}
+
+// Capitalize the word "i" grammatically
+export function capitalizeI(text: string): string {
+  // Replace standalone "i" with "I" (word boundaries ensure we don't affect words like "in", "it", etc.)
+  return text.replace(/\bi\b/g, 'I');
+}
+
 export const baseStyle = {
   width: "1080px",
   height: "1080px",
@@ -54,4 +89,9 @@ export const textStyle = {
   whiteSpace: "pre-wrap",
   textAlign: "left", // Back to left-aligned as requested
   maxWidth: "560px", // Shorter lines to avoid orphaned words
+  // Prevent orphaned words (widows/orphans)
+  orphans: 2, // Minimum 2 lines at start of page/column
+  widows: 2, // Minimum 2 lines at end of page/column
+  // Add word spacing to help with line breaks
+  wordSpacing: "0.1em",
 } as const;

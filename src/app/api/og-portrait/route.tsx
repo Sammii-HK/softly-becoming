@@ -1,6 +1,6 @@
 import { ImageResponse } from "@vercel/og";
 import { NextRequest } from "next/server";
-import { getColorForText } from "@/lib/render/og-style";
+import { getColorForText, preventOrphanedWords, enhanceParagraphSpacing, capitalizeI } from "@/lib/render/og-style";
 import React from "react";
 
 export const runtime = "edge";
@@ -11,8 +11,11 @@ export const runtime = "edge";
 
 export async function GET(req: NextRequest) {
   const { searchParams } = new URL(req.url);
-  const text = (searchParams.get("text") ?? "soft rebuild").replace(/\\n/g, "\n");
-  const colors = getColorForText(text);
+  const rawText = (searchParams.get("text") ?? "soft rebuild").replace(/\\n/g, "\n");
+  const capitalizedText = capitalizeI(rawText);
+  const spacedText = enhanceParagraphSpacing(capitalizedText);
+  const text = preventOrphanedWords(spacedText);
+  const colors = getColorForText(rawText);
   // const fontData = await FONT;
 
   return new ImageResponse(
@@ -35,7 +38,11 @@ export async function GET(req: NextRequest) {
           whiteSpace: "pre-wrap", 
           maxWidth: 600, // Shorter lines to avoid orphaned words
           textAlign: "left", // Back to left-aligned as requested
-          fontWeight: "400"
+          fontWeight: "400",
+          // Prevent orphaned words
+          orphans: 2,
+          widows: 2,
+          wordSpacing: "0.1em"
         }}>
           {text}
         </div>

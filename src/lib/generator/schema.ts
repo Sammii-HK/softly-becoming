@@ -6,7 +6,7 @@ export type Theme = z.infer<typeof Theme>;
 export const Tone = z.enum(["honest", "hopeful", "gentle", "empowered", "reflective"]);
 export type Tone = z.infer<typeof Tone>;
 
-export const Structure = z.enum(["three_line", "affirmation", "letter", "internal", "two_line"]);
+export const Structure = z.enum(["three_line", "affirmation", "internal", "two_line"]);
 export type Structure = z.infer<typeof Structure>;
 
 export const Quote = z.object({
