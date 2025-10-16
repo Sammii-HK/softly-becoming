@@ -22,7 +22,7 @@ export async function GET(req: Request) {
       })
     ]);
 
-    const eventMap = Object.fromEntries(events.map(e => [e.type, e._count.type]));
+    const eventMap = Object.fromEntries(events.map((e: any) => [e.type, e._count.type]));
 
     return NextResponse.json({
       countFree,

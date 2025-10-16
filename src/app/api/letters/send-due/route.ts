@@ -25,7 +25,7 @@ export async function GET(req: Request) {
   for (const letter of due) {
     const chunk = 800;
     for (let i = 0; i < subs.length; i += chunk) {
-      const to = subs.slice(i, i + chunk).map(s => s.email);
+      const to = subs.slice(i, i + chunk).map((s: any) => s.email);
       await resend.emails.send({
         from: process.env.EMAIL_FROM!,
         to, subject: letter.subject, html: letter.bodyHtml, text: letter.bodyText
