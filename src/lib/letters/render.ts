@@ -3,7 +3,7 @@ export function renderHtml(j: any) {
   const p = (s:string)=>`<p>${s.replace(/\n/g,"<br/>")}</p>`;
   return `
   <div style="${css}">
-    <h2 style="font-weight:400;margin:0 0 16px">soft rebuild — sunday letter</h2>
+    <h2 style="font-weight:400;margin:0 0 16px">Softly Becoming — Sunday Letter</h2>
     ${p(j.opening)}
     ${p(j.lesson)}
     <h3 style="font-weight:500;margin:16px 0 8px">a 5-minute practice</h3>
@@ -21,7 +21,7 @@ export function renderHtml(j: any) {
 
 export function renderText(j: any) {
   return [
-    "soft rebuild — sunday letter",
+    "Softly Becoming — Sunday Letter",
     "",
     j.opening, "",
     j.lesson, "",

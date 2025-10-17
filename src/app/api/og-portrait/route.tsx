@@ -11,7 +11,7 @@ export const runtime = "edge";
 
 export async function GET(req: NextRequest) {
   const { searchParams } = new URL(req.url);
-  const rawText = (searchParams.get("text") ?? "soft rebuild").replace(/\\n/g, "\n");
+  const rawText = (searchParams.get("text") ?? "Softly Becoming").replace(/\\n/g, "\n");
   
   try {
     // Simplified text processing
@@ -21,7 +21,7 @@ export async function GET(req: NextRequest) {
     // Split text for highlighting
     const lines = text.split('\n').map(line => line.trim()).filter(line => line);
     if (lines.length === 0) {
-      lines.push("soft rebuild");
+      lines.push("Softly Becoming");
     }
 
     return new ImageResponse(

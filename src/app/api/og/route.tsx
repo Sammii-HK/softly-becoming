@@ -11,7 +11,7 @@ export const runtime = "edge";
 
 export async function GET(req: NextRequest) {
   const { searchParams } = new URL(req.url);
-  const rawText = searchParams.get("text") ?? "soft rebuild";
+  const rawText = searchParams.get("text") ?? "Softly Becoming";
   const showBranding = searchParams.get("branding") === "true";
   
   try {

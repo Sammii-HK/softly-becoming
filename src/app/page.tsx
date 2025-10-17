@@ -10,8 +10,55 @@ export default function Home() {
     "you are learning to trust yourself.\nyou don't need anyone's permission."
   ];
 
+  // Structured data for SEO
+  const structuredData = {
+    "@context": "https://schema.org",
+    "@type": "Organization",
+    "name": "Softly Becoming",
+    "description": "Daily gentle reflections, weekly letters, and beautiful quote collections for women rebuilding their lives with intention.",
+    "url": "https://softlybecoming.uk",
+    "logo": "https://softlybecoming.uk/api/og?text=Softly%20Becoming&branding=true",
+    "sameAs": [
+      "https://www.instagram.com/softly.becoming.studio/",
+      "https://uk.pinterest.com/softlybecomingstudio/",
+      "https://x.com/softly_becoming"
+    ],
+    "contactPoint": {
+      "@type": "ContactPoint",
+      "contactType": "customer service",
+      "email": "hello@softlybecoming.uk"
+    },
+    "founder": {
+      "@type": "Person",
+      "name": "Softly Becoming Studio"
+    },
+    "offers": [
+      {
+        "@type": "Offer",
+        "name": "Daily Newsletter",
+        "description": "Free daily gentle reflections delivered to your inbox",
+        "price": "0",
+        "priceCurrency": "GBP"
+      },
+      {
+        "@type": "Offer",
+        "name": "Digital Quote Collections",
+        "description": "Beautiful quote graphics for personal and commercial use",
+        "price": "29",
+        "priceCurrency": "GBP"
+      }
+    ]
+  };
+
   return (
-    <main className="min-h-screen bg-[#FAF9F7] text-[#3A3A3A]">
+    <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify(structuredData),
+        }}
+      />
+      <main className="min-h-screen bg-[#FAF9F7] text-[#3A3A3A]">
       {/* Hero Section */}
       <section className="relative overflow-hidden">
         <div className="max-w-6xl mx-auto px-6 py-24">
@@ -329,12 +376,13 @@ export default function Home() {
               <div className="flex gap-4 mt-4 md:mt-0">
                 <a href="/terms" className="hover:opacity-100 transition-opacity">Terms</a>
                 <a href="/privacy" className="hover:opacity-100 transition-opacity">Privacy</a>
-                <a href="mailto:hello@softrebuild.com" className="hover:opacity-100 transition-opacity">Contact</a>
+                <a href="mailto:hello@softlybecoming.uk" className="hover:opacity-100 transition-opacity">Contact</a>
               </div>
             </div>
           </div>
       </div>
       </footer>
-    </main>
+      </main>
+    </>
   );
 }

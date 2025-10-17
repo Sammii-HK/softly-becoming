@@ -19,9 +19,9 @@ export default function InboxPage() {
 
   return (
     <main className="max-w-md mx-auto px-6 py-16">
-      <h1 className="text-2xl mb-4">Soft Rebuild Daily</h1>
+      <h1 className="text-2xl mb-4">Softly Becoming Daily</h1>
       <p className="opacity-80 mb-6">
-        One gentle note each morning. Free, calm, and in British English.
+        One gentle note each morning. Free, calm, and beautifully crafted.
       </p>
       {done ? (
         <div className="p-4 rounded bg-green-50 border border-green-200">
