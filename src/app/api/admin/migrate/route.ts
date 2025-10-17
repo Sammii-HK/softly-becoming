@@ -12,31 +12,29 @@ export async function POST(req: Request) {
   }
 
   try {
-    // Test database connection first
-    await prisma.$queryRaw`SELECT 1`;
+    // Test database connection by counting subscribers
+    const subscriberCount = await prisma.subscriber.count();
     
-    // Check if tables exist
-    const tables = await prisma.$queryRaw`
-      SELECT name FROM sqlite_master WHERE type='table'
-    ` as any[];
+    // Simple table existence check
+    let hasAllTables = true;
+    try {
+      await prisma.subscriber.findFirst();
+      await prisma.emailEvent.findFirst();
+      await prisma.letter.findFirst();
+    } catch (error) {
+      hasAllTables = false;
+    }
     
-    const tableNames = tables.map((t: any) => t.name);
-    const hasSubscriber = tableNames.includes('Subscriber');
-    const hasEmailEvent = tableNames.includes('EmailEvent');
-    const hasLetter = tableNames.includes('Letter');
-
     return NextResponse.json({
       success: true,
       database: {
         connected: true,
-        tables: tableNames,
+        subscriberCount,
         schema: {
-          subscriber: hasSubscriber,
-          emailEvent: hasEmailEvent,
-          letter: hasLetter
+          allTablesExist: hasAllTables
         }
       },
-      message: "Database connection successful"
+      message: hasAllTables ? "Database fully configured" : "Database connected but tables missing"
     });
 
   } catch (error) {
