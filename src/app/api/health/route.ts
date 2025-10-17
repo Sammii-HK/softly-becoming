@@ -11,8 +11,16 @@ export async function GET() {
       database: !!process.env.DATABASE_URL,
       resend: !!process.env.RESEND_API_KEY,
       stripe: !!process.env.STRIPE_SECRET_KEY,
-      succulent: !!process.env.SUCCULENT_API_KEY,
-      blob: !!process.env.BLOB_READ_WRITE_TOKEN
+      succulent: !!process.env.AYRSHARE_API_KEY,
+      blob: !!process.env.BLOB_READ_WRITE_TOKEN,
+      adminToken: !!process.env.ADMIN_TOKEN,
+      publicAdminToken: !!process.env.NEXT_PUBLIC_ADMIN_TOKEN,
+      emailFrom: !!process.env.EMAIL_FROM,
+      testEmail: !!process.env.TEST_EMAIL,
+      webhookSecrets: {
+        resend: !!process.env.RESEND_WEBHOOK_SECRET,
+        stripe: !!process.env.STRIPE_WEBHOOK_SECRET
+      }
     };
 
     return NextResponse.json({
