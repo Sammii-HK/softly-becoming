@@ -40,3 +40,9 @@ yarn-error.log*
 *.tsbuildinfo
 next-env.d.ts
 product-packs/
+
+# Database files
+*.db
+*.db-*
+dev.db*
+prisma/*.db
