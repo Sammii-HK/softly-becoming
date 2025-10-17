@@ -3,85 +3,51 @@ import { generateAndUploadPack } from "@/lib/storage/blob-direct";
 import { assertAdmin } from "@/lib/auth/internal";
 
 // Predefined pack configurations
+// Impulse buy pricing - based on our informed pricing strategy
 const PACK_CONFIGS = [
   {
     name: 'soft-strength-collection',
     series: 'soft-strength',
-    count: 25,
-    seed: 12345,
+    count: 15,
     theme: 'soft_strength',
     format: 'both' as const,
-    price: 29,
-    description: 'Beautiful quotes about finding strength in gentleness. Both square and portrait formats included.'
-  },
-  {
-    name: 'soft-strength-collection-vol2',
-    series: 'soft-strength',
-    count: 25,
-    seed: 67890, // Different seed = different quotes!
-    theme: 'soft_strength',
-    format: 'both' as const,
-    price: 29,
-    description: 'Volume 2: More beautiful quotes about finding strength in gentleness. Both square and portrait formats included.'
-  },
-  {
-    name: 'soft-strength-collection-vol3',
-    series: 'soft-strength',
-    count: 25,
-    seed: 98765, // Another different seed
-    theme: 'soft_strength',
-    format: 'both' as const,
-    price: 29,
-    description: 'Volume 3: Even more beautiful quotes about finding strength in gentleness. Both square and portrait formats included.'
+    price: 4.99,
+    description: 'Beautiful quotes about finding strength in gentleness. Instagram posts + phone wallpapers included.'
   },
   {
     name: 'rebuilding-journey',
     series: 'rebuilding',
-    count: 20,
-    seed: 54321,
+    count: 15,
     theme: 'rebuilding',
-    format: 'square' as const,
-    price: 24,
+    format: 'both' as const,
+    price: 4.99,
     description: 'Inspiring quotes for women starting over and rebuilding their lives with intention.'
-  },
-  {
-    name: 'rebuilding-journey-vol2',
-    series: 'rebuilding',
-    count: 20,
-    seed: 11111, // Different seed for volume 2
-    theme: 'rebuilding',
-    format: 'square' as const,
-    price: 24,
-    description: 'Volume 2: More inspiring quotes for women rebuilding their lives with grace and intention.'
   },
   {
     name: 'self-trust-quotes',
     series: 'self-trust',
-    count: 30,
-    seed: 98765,
-    theme: 'self_trust',
-    format: 'portrait' as const,
-    price: 34,
-    description: 'Powerful quotes about trusting yourself and your inner wisdom. Perfect for Instagram stories.'
+    count: 15,
+    theme: 'becoming',
+    format: 'both' as const,
+    price: 4.99,
+    description: 'Empowering quotes about trusting yourself and your inner wisdom.'
   },
   {
     name: 'gentle-boundaries',
     series: 'boundaries',
-    count: 20,
-    seed: 22222,
+    count: 15,
     theme: 'letting_go',
     format: 'both' as const,
-    price: 27,
+    price: 4.99,
     description: 'Learn to set boundaries with kindness. Perfect for people-pleasers learning to say no.'
   },
   {
     name: 'morning-affirmations',
     series: 'daily-rituals',
     count: 15,
-    seed: 33333,
     theme: 'becoming',
-    format: 'square' as const,
-    price: 22,
+    format: 'both' as const,
+    price: 4.99,
     description: 'Start your day with gentle affirmations. Perfect for morning routines and self-care.'
   }
 ];
