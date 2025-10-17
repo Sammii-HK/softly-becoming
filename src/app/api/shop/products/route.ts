@@ -1,9 +1,6 @@
 import { NextResponse } from "next/server";
-import Stripe from "stripe";
-
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
-  apiVersion: "2023-10-16",
-});
+import { readFileSync, readdirSync, existsSync } from "fs";
+import { join } from "path";
 
 interface ProductPack {
   packId: string;
@@ -17,7 +14,7 @@ interface ProductPack {
   previewImage: string;
   format: string;
   theme?: string;
-  stripePriceId: string;
+  stripePriceId?: string;
 }
 
 interface SeriesData {
@@ -28,61 +25,49 @@ interface SeriesData {
 
 export async function GET() {
   try {
-    if (!process.env.STRIPE_SECRET_KEY) {
-      return NextResponse.json({
+    const productsDir = join(process.cwd(), 'product-packs');
+    
+    if (!existsSync(productsDir)) {
+      return NextResponse.json({ 
         series: [],
         products: [],
-        message: "Stripe not configured. Add STRIPE_SECRET_KEY environment variable."
+        message: "No products generated yet. Run 'npm run generate:packs' to create some!" 
       });
     }
 
-    // Get all products from Stripe with metadata
-    const stripeProducts = await stripe.products.list({
-      active: true,
-      expand: ['data.default_price'],
-      limit: 100,
-    });
+    const seriesFolders = readdirSync(productsDir, { withFileTypes: true })
+      .filter(dirent => dirent.isDirectory())
+      .map(dirent => dirent.name);
 
+    const allSeries: SeriesData[] = [];
     const allProducts: ProductPack[] = [];
-    const seriesMap = new Map<string, ProductPack[]>();
 
-    for (const product of stripeProducts.data) {
-      // Only process products that have our pack metadata
-      if (product.metadata?.packId && product.metadata?.series) {
-        const defaultPrice = product.default_price as Stripe.Price;
-        const price = defaultPrice ? (defaultPrice.unit_amount || 0) / 100 : 0;
+    for (const seriesName of seriesFolders) {
+      const seriesDir = join(productsDir, seriesName);
+      const indexFile = join(seriesDir, 'series-index.json');
+      
+      if (existsSync(indexFile)) {
+        try {
+          const seriesData: SeriesData = JSON.parse(readFileSync(indexFile, 'utf8'));
+          
+          // Add Stripe price IDs based on series and pack name
+          const processedPacks = seriesData.packs.map(pack => ({
+            ...pack,
+            stripePriceId: generateStripePriceId(pack.packId),
+            previewImage: `/product-packs/${seriesName}/${pack.previewImage}`
+          }));
 
-        const productPack: ProductPack = {
-          packId: product.metadata.packId,
-          packName: product.name,
-          series: product.metadata.series,
-          version: product.metadata.version || "1.0",
-          generatedAt: product.metadata.generatedAt || new Date(product.created * 1000).toISOString(),
-          totalImages: parseInt(product.metadata.totalImages || "0"),
-          price: price,
-          description: product.description || "",
-          previewImage: product.images[0] || "/api/og?text=" + encodeURIComponent(product.name),
-          format: product.metadata.format || "square",
-          theme: product.metadata.theme,
-          stripePriceId: defaultPrice?.id || "",
-        };
-
-        allProducts.push(productPack);
-
-        // Group by series
-        if (!seriesMap.has(productPack.series)) {
-          seriesMap.set(productPack.series, []);
+          allSeries.push({
+            ...seriesData,
+            packs: processedPacks
+          });
+          
+          allProducts.push(...processedPacks);
+        } catch (error) {
+          console.error(`Error reading series index for ${seriesName}:`, error);
         }
-        seriesMap.get(productPack.series)!.push(productPack);
       }
     }
-
-    // Convert series map to array
-    const allSeries: SeriesData[] = Array.from(seriesMap.entries()).map(([seriesName, packs]) => ({
-      seriesName,
-      packs: packs.sort((a, b) => new Date(b.generatedAt).getTime() - new Date(a.generatedAt).getTime()),
-      lastUpdated: new Date().toISOString(),
-    }));
 
     // Sort products by creation date (newest first)
     allProducts.sort((a, b) => new Date(b.generatedAt).getTime() - new Date(a.generatedAt).getTime());
@@ -92,22 +77,19 @@ export async function GET() {
       products: allProducts,
       totalProducts: allProducts.length,
       totalSeries: allSeries.length,
-      lastUpdated: new Date().toISOString(),
-      source: "stripe" // Indicate data source
+      lastUpdated: new Date().toISOString()
     });
 
   } catch (error) {
-    console.error("Error fetching products from Stripe:", error);
-    
-    // Fallback to empty state with helpful message
-    return NextResponse.json({
-      series: [],
-      products: [],
-      totalProducts: 0,
-      totalSeries: 0,
-      error: "Failed to fetch products from Stripe",
-      message: "Make sure Stripe is configured and products have proper metadata",
-      lastUpdated: new Date().toISOString()
-    });
+    console.error("Error fetching products:", error);
+    return NextResponse.json(
+      { error: "Failed to fetch products" },
+      { status: 500 }
+    );
   }
+}
+
+function generateStripePriceId(packId: string): string {
+  // Generate consistent Stripe price IDs based on pack ID
+  return `price_${packId.replace(/[^a-zA-Z0-9]/g, '_').toLowerCase()}`;
 }

@@ -33,13 +33,13 @@ export default function ProductCard({ product }: ProductCardProps) {
     setLoading(true);
     
     try {
-      const response = await fetch('/api/checkout', {
+      const response = await fetch('/api/checkout/product-tier', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           productId: product.packId,
-          license: selectedTier,
-          currency
+          tier: selectedTier,
+          productName: product.packName
         })
       });
       
