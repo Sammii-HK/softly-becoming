@@ -3,7 +3,7 @@ import { Resend } from "resend";
 
 export async function GET(req: NextRequest) {
   const { searchParams } = new URL(req.url);
-  const testEmail = searchParams.get("email") || "test@example.com";
+  const testEmail = searchParams.get("email") || process.env.TEST_EMAIL || "test@example.com";
 
   // Check environment variables
   if (!process.env.RESEND_API_KEY) {

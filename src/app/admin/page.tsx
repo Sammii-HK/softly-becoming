@@ -1,4 +1,32 @@
+"use client";
+
+import { useState } from "react";
+
 export default function AdminDashboard() {
+  const [sending, setSending] = useState<string | null>(null);
+
+  const sendTestEmail = async (type: 'welcome' | 'newsletter') => {
+    setSending(type);
+    try {
+      const response = await fetch('/api/admin/send-test-email', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ type })
+      });
+      
+      const result = await response.json();
+      
+      if (result.success) {
+        alert(`✅ Test ${type} email sent successfully to ${result.sentTo}!`);
+      } else {
+        alert(`❌ Failed to send test email: ${result.error}`);
+      }
+    } catch (error) {
+      alert(`❌ Error sending test email: ${error}`);
+    } finally {
+      setSending(null);
+    }
+  };
   return (
     <main className="min-h-screen bg-[#FAF9F7] text-[#3A3A3A]">
       <div className="max-w-7xl mx-auto px-6 py-16">
@@ -41,12 +69,12 @@ export default function AdminDashboard() {
           </a>
 
           <a 
-            href="/admin/metrics"
+            href="/admin/email-analytics"
             className="bg-yellow-50 border border-yellow-200 rounded-lg p-6 text-center hover:shadow-md transition-shadow"
           >
             <div className="text-3xl mb-3">📊</div>
-            <h3 className="font-semibold mb-2">Analytics</h3>
-            <p className="text-sm text-gray-600">Email & subscriber metrics</p>
+            <h3 className="font-semibold mb-2">Email Analytics</h3>
+            <p className="text-sm text-gray-600">Delivery, opens, clicks & more</p>
           </a>
         </div>
 
@@ -107,6 +135,26 @@ export default function AdminDashboard() {
                 <div className="font-medium">Email Delivery Test</div>
                 <div className="text-sm text-gray-600">Verify email system</div>
               </a>
+              <button 
+                onClick={() => sendTestEmail('welcome')}
+                disabled={sending === 'welcome'}
+                className="w-full text-left p-3 bg-green-50 rounded hover:bg-green-100 transition-colors border border-green-200 disabled:opacity-50"
+              >
+                <div className="font-medium text-green-800">
+                  {sending === 'welcome' ? '⏳ Sending...' : '📧 Send Test Welcome Email'}
+                </div>
+                <div className="text-sm text-green-600">Send to your configured test email</div>
+              </button>
+              <button 
+                onClick={() => sendTestEmail('newsletter')}
+                disabled={sending === 'newsletter'}
+                className="w-full text-left p-3 bg-blue-50 rounded hover:bg-blue-100 transition-colors border border-blue-200 disabled:opacity-50"
+              >
+                <div className="font-medium text-blue-800">
+                  {sending === 'newsletter' ? '⏳ Sending...' : '📰 Send Test Newsletter'}
+                </div>
+                <div className="text-sm text-blue-600">Preview newsletter format</div>
+              </button>
               <a href="/api/health" target="_blank" className="block p-3 bg-gray-50 rounded hover:bg-gray-100 transition-colors">
                 <div className="font-medium">System Status</div>
                 <div className="text-sm text-gray-600">Real-time health check</div>
