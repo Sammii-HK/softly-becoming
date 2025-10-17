@@ -6,56 +6,13 @@ const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, { apiVersion: "2023-10
 
 export async function POST(req: Request) {
   try {
-    const { productId, tier = 'personal', productName, customPrice } = await req.json();
+    const { productId, priceId, productName, tier = 'personal' } = await req.json();
 
-    if (!productId || !productName) {
+    if (!productId || !productName || !priceId) {
       return NextResponse.json(
-        { error: "Missing required fields: productId, productName" },
+        { error: "Missing required fields: productId, productName, priceId" },
         { status: 400 }
       );
-    }
-
-    // Get pricing for the product
-    const pricing = BASE_PACK_PRICES[productId as keyof typeof BASE_PACK_PRICES];
-    let price = customPrice;
-    
-    if (!price && pricing) {
-      price = pricing[tier as keyof typeof pricing];
-    }
-    
-    if (!price) {
-      return NextResponse.json(
-        { error: "Could not determine price for product" },
-        { status: 400 }
-      );
-    }
-
-    // Create or find Stripe price
-    let stripePriceId = `price_${productId.replace(/[^a-zA-Z0-9]/g, '_').toLowerCase()}_${tier}`;
-    
-    // Check if price already exists
-    try {
-      await stripe.prices.retrieve(stripePriceId);
-    } catch (error) {
-      // Price doesn't exist, create it
-      const stripePrice = await stripe.prices.create({
-        unit_amount: Math.round(price * 100),
-        currency: 'usd',
-        metadata: {
-          productId,
-          tier,
-          licenseType: tier
-        },
-        product_data: {
-          name: `${productName} (${tier.charAt(0).toUpperCase() + tier.slice(1)} License)`,
-          metadata: {
-            productId,
-            tier,
-            type: 'digital_product'
-          }
-        }
-      });
-      stripePriceId = stripePrice.id;
     }
 
     // Create checkout session
@@ -64,7 +21,7 @@ export async function POST(req: Request) {
       payment_method_types: ["card"],
       line_items: [
         {
-          price: stripePriceId,
+          price: priceId,
           quantity: 1,
         },
       ],

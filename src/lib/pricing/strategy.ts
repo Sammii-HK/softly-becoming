@@ -50,14 +50,14 @@ export function calculatePackPricing(imageCount: number, format: string, theme: 
   };
 }
 
-// Predefined competitive base prices
+// Impulse buy base prices (in GBP)
 export const BASE_PACK_PRICES = {
-  'soft-strength-collection': { personal: 19, commercial: 34, extended: 47 },
-  'rebuilding-journey': { personal: 16, commercial: 29, extended: 39 },
-  'self-trust-quotes': { personal: 22, commercial: 39, extended: 55 },
-  'gentle-boundaries': { personal: 18, commercial: 32, extended: 45 },
-  'morning-affirmations': { personal: 14, commercial: 25, extended: 35 },
-  'mixed-inspiration-pack': { personal: 39, commercial: 69, extended: 97 }
+  'soft-strength-collection': { personal: 3.99, commercial: 7.99, extended: 12.99 },
+  'rebuilding-journey': { personal: 3.99, commercial: 7.99, extended: 12.99 },
+  'self-trust-quotes': { personal: 3.99, commercial: 7.99, extended: 12.99 },
+  'gentle-boundaries': { personal: 3.99, commercial: 7.99, extended: 12.99 },
+  'morning-affirmations': { personal: 3.99, commercial: 7.99, extended: 12.99 },
+  'mixed-inspiration-pack': { personal: 5.99, commercial: 9.99, extended: 15.99 }
 } as const;
 
 function getPackDescription(imageCount: number, format: string): string {

@@ -100,8 +100,8 @@ export async function generateAndUploadPack(
       seed: config.seed,
       theme: config.theme,
       format: config.format,
-      price: config.price,
       description: config.description,
+      // Pricing handled by Stripe license tiers
       quotes: quotes.map((q, i) => ({
         index: i + 1,
         theme: q.theme,

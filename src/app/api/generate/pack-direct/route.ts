@@ -11,7 +11,6 @@ const PACK_CONFIGS = [
     count: 15,
     theme: 'soft_strength',
     format: 'both' as const,
-    price: 4.99,
     description: 'Beautiful quotes about finding strength in gentleness. Instagram posts + phone wallpapers included.'
   },
   {
@@ -20,7 +19,6 @@ const PACK_CONFIGS = [
     count: 15,
     theme: 'rebuilding',
     format: 'both' as const,
-    price: 4.99,
     description: 'Inspiring quotes for women starting over and rebuilding their lives with intention.'
   },
   {
@@ -29,7 +27,6 @@ const PACK_CONFIGS = [
     count: 15,
     theme: 'becoming',
     format: 'both' as const,
-    price: 4.99,
     description: 'Empowering quotes about trusting yourself and your inner wisdom.'
   },
   {
@@ -38,7 +35,6 @@ const PACK_CONFIGS = [
     count: 15,
     theme: 'letting_go',
     format: 'both' as const,
-    price: 4.99,
     description: 'Learn to set boundaries with kindness. Perfect for people-pleasers learning to say no.'
   },
   {
@@ -47,7 +43,6 @@ const PACK_CONFIGS = [
     count: 15,
     theme: 'becoming',
     format: 'both' as const,
-    price: 4.99,
     description: 'Start your day with gentle affirmations. Perfect for morning routines and self-care.'
   }
 ];

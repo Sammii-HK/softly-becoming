@@ -40,10 +40,10 @@ export default function PacksAdminPage() {
                   packId: pack.packId,
                   packName: pack.metadata.packName,
                   description: pack.metadata.description,
-                  price: pack.metadata.price,
                   totalImages: pack.metadata.totalImages,
                   series: pack.metadata.series,
-                  previewImageUrl: pack.previewUrl
+                  previewImageUrl: pack.previewUrl,
+                  format: pack.metadata.format || 'both'
                 })
               });
               

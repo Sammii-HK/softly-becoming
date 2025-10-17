@@ -12,13 +12,13 @@ export interface PriceConfig {
   currency: Currency;
 }
 
-// Base pricing matrix in GBP (Stripe will handle currency conversion)
+// Impulse buy pricing matrix in GBP (Stripe will handle currency conversion)
 const PRICING_MATRIX = {
-  15: { personal: 800, commercial: 1500, extended: 2500 }, // £8.00, £15.00, £25.00 in pence
-  25: { personal: 1200, commercial: 1900, extended: 2900 }, // £12.00, £19.00, £29.00
-  35: { personal: 1800, commercial: 2700, extended: 3900 }, // £18.00, £27.00, £39.00
-  50: { personal: 2200, commercial: 3200, extended: 4500 }, // £22.00, £32.00, £45.00
-  999: { personal: 2800, commercial: 4200, extended: 5900 } // £28.00, £42.00, £59.00 (>50)
+  15: { personal: 399, commercial: 799, extended: 1299 }, // £3.99, £7.99, £12.99 in pence
+  25: { personal: 599, commercial: 999, extended: 1599 }, // £5.99, £9.99, £15.99
+  35: { personal: 799, commercial: 1299, extended: 1999 }, // £7.99, £12.99, £19.99
+  50: { personal: 999, commercial: 1599, extended: 2499 }, // £9.99, £15.99, £24.99
+  999: { personal: 1299, commercial: 1999, extended: 2999 } // £12.99, £19.99, £29.99 (>50)
 } as const;
 
 /**

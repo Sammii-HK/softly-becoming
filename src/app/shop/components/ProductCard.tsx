@@ -11,6 +11,11 @@ interface ProductPack {
   totalImages: number;
   previewImage: string;
   format: string;
+  prices: {
+    personal: { priceId: string; amount: number; formatted: string };
+    commercial: { priceId: string; amount: number; formatted: string };
+    extended: { priceId: string; amount: number; formatted: string };
+  };
 }
 
 interface ProductCardProps {
@@ -22,12 +27,8 @@ export default function ProductCard({ product }: ProductCardProps) {
   const [loading, setLoading] = useState(false);
   const currency = getDefaultCurrency();
 
-  // Get pricing for each tier (in pence/cents)
-  const prices = {
-    personal: getBasePriceInCents(product.totalImages, 'personal'),
-    commercial: getBasePriceInCents(product.totalImages, 'commercial'),
-    extended: getBasePriceInCents(product.totalImages, 'extended')
-  };
+  // Use Stripe prices as SSOT (already formatted from API)
+  const prices = product.prices;
 
   const handlePurchase = async () => {
     setLoading(true);
@@ -38,8 +39,8 @@ export default function ProductCard({ product }: ProductCardProps) {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           productId: product.packId,
-          tier: selectedTier,
-          productName: product.packName
+          priceId: prices[selectedTier].priceId,
+          productName: `${product.packName} (${selectedTier} license)`
         })
       });
       
@@ -130,7 +131,7 @@ export default function ProductCard({ product }: ProductCardProps) {
                   </div>
                 </div>
                 <div className="text-lg font-light">
-                  {formatPriceFromCents(prices[tier], currency)}
+                  {prices[tier].formatted}
                 </div>
               </label>
             ))}

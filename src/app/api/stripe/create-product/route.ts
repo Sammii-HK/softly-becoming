@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import Stripe from "stripe";
 import { assertAdmin } from "@/lib/auth/internal";
+import { getBasePriceInCents, type LicenseTier } from "@/lib/pricing/getPrices";
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, { apiVersion: "2023-10-16" });
 
@@ -17,123 +18,89 @@ export async function POST(req: Request) {
       packId,
       packName,
       description,
-      price,
       totalImages,
       series,
-      previewImageUrl
+      previewImageUrl,
+      format = 'both'
     } = await req.json();
 
-    if (!packId || !packName || !price) {
+    if (!packId || !packName || !totalImages) {
       return NextResponse.json(
-        { error: "Missing required fields: packId, packName, price" },
+        { error: "Missing required fields: packId, packName, totalImages" },
         { status: 400 }
       );
     }
 
-    // Create Stripe product
+    // Create base Stripe product
     const product = await stripe.products.create({
       name: packName,
-      description: description || `${totalImages} beautiful quote graphics for social media`,
+      description: description || `${totalImages} beautiful quote graphics for social media and phone wallpapers`,
       images: previewImageUrl ? [previewImageUrl] : [],
       metadata: {
         packId,
         series: series || 'unknown',
         totalImages: totalImages?.toString() || '0',
+        format: format,
         type: 'digital_product',
-        createdBy: 'softly-becoming-studio'
+        createdBy: 'softly-becoming-studio',
+        generatedAt: new Date().toISOString()
       },
-      // Mark as digital product
       type: 'good',
-      // Add product details
       shippable: false,
-      // SEO-friendly URL
-      url: `${process.env.NEXT_PUBLIC_BASE_URL}/shop-dynamic?product=${packId}`
+      url: `${process.env.NEXT_PUBLIC_BASE_URL}/shop?product=${packId}`
     });
 
-    // Create THREE prices for different license tiers
-    const personalPrice = await stripe.prices.create({
-      product: product.id,
-      unit_amount: Math.round(price * 100), // Base personal price
-      currency: 'usd',
-      nickname: 'Personal License',
-      metadata: {
-        packId,
-        series: series || 'unknown',
-        tier: 'personal'
-      }
-    });
+    // Create pricing for each license tier using our pricing matrix
+    const licenseTypes: LicenseTier[] = ['personal', 'commercial', 'extended'];
+    const createdPrices = [];
 
-    const commercialPrice = await stripe.prices.create({
-      product: product.id,
-      unit_amount: Math.round(price * 1.8 * 100), // +80% for commercial
-      currency: 'usd',
-      nickname: 'Commercial License',
-      metadata: {
-        packId,
-        series: series || 'unknown',
-        tier: 'commercial'
-      }
-    });
+    for (const tier of licenseTypes) {
+      const priceInPence = getBasePriceInCents(totalImages, tier);
+      
+      const price = await stripe.prices.create({
+        product: product.id,
+        currency: 'gbp',
+        unit_amount: priceInPence,
+        nickname: `${packName} - ${tier} license`,
+        metadata: {
+          packId,
+          licenseType: tier,
+          totalImages: totalImages.toString(),
+          pricePerImage: (priceInPence / totalImages / 100).toFixed(3)
+        }
+      });
 
-    const extendedPrice = await stripe.prices.create({
-      product: product.id,
-      unit_amount: Math.round(price * 2.5 * 100), // +150% for extended
-      currency: 'usd',
-      nickname: 'Extended License',
-      metadata: {
-        packId,
-        series: series || 'unknown',
-        tier: 'extended'
-      }
-    });
+      createdPrices.push({
+        tier,
+        priceId: price.id,
+        amount: priceInPence,
+        formatted: `£${(priceInPence / 100).toFixed(2)}`,
+        perImage: `£${(priceInPence / totalImages / 100).toFixed(2)}`
+      });
+    }
 
     return NextResponse.json({
       success: true,
+      message: `Product "${packName}" created successfully with 3 license tiers`,
       product: {
         id: product.id,
         name: product.name,
-        description: product.description,
-        images: product.images,
-        metadata: product.metadata
+        packId,
+        totalImages,
+        series,
+        format
       },
-      prices: {
-        personal: {
-          id: personalPrice.id,
-          amount: personalPrice.unit_amount,
-          formatted: `$${price}`
-        },
-        commercial: {
-          id: commercialPrice.id,
-          amount: commercialPrice.unit_amount,
-          formatted: `$${Math.round(price * 1.8)}`
-        },
-        extended: {
-          id: extendedPrice.id,
-          amount: extendedPrice.unit_amount,
-          formatted: `$${Math.round(price * 2.5)}`
-        }
-      },
-      defaultPriceId: personalPrice.id, // Default to personal
-      message: `Product "${packName}" created successfully in Stripe`
+      pricing: createdPrices,
+      stripeDashboard: `https://dashboard.stripe.com/products/${product.id}`
     });
 
   } catch (error) {
     console.error("Stripe product creation error:", error);
     
-    if (error instanceof Stripe.errors.StripeError) {
-      return NextResponse.json(
-        { 
-          error: "Stripe API error", 
-          details: error.message,
-          type: error.type 
-        },
-        { status: 400 }
-      );
-    }
-
-    return NextResponse.json(
-      { error: "Failed to create Stripe product" },
-      { status: 500 }
-    );
+    return NextResponse.json({
+      success: false,
+      error: error instanceof Error ? error.message : "Unknown error",
+      details: "Failed to create Stripe product with license tiers"
+    }, { status: 500 });
   }
 }

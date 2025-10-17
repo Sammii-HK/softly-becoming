@@ -23,3 +23,4 @@ export default function InboxLayout({
 }) {
   return children;
 }
+
