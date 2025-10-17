@@ -1,11 +1,9 @@
 import { NextResponse } from "next/server";
-import { PrismaClient } from "@prisma/client";
 import { Resend } from "resend";
 import { generateQuotes } from "@/lib/generator/builder";
 import { guardQuote } from "@/lib/quality/contentGuard";
 import { assertInternal } from "@/lib/auth/internal";
-
-const prisma = new PrismaClient();
+import { prisma } from "@/lib/database/client";
 // Note: Using Node.js runtime because Prisma Client requires Node.js APIs
 // export const runtime = "edge";
 

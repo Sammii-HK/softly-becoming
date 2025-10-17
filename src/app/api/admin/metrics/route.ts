@@ -1,8 +1,6 @@
 import { NextResponse } from "next/server";
-import { PrismaClient } from "@prisma/client";
 import { assertAdmin } from "@/lib/auth/internal";
-
-const prisma = new PrismaClient();
+import { prisma } from "@/lib/database/client";
 
 export async function GET(req: Request) {
   try { 

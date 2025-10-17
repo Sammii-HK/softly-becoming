@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import Stripe from "stripe";
-import { PrismaClient } from "@prisma/client";
+import { prisma } from "@/lib/database/client";
 // Removed getProductById - using simpler approach
 // Removed packageZip - using existing Vercel Blob system instead
 import { sendOrderEmail } from "@/lib/fulfilment/sendEmail";
@@ -8,7 +8,6 @@ import { LicenseTier, Currency } from "@/lib/pricing/getPrices";
 import path from "path";
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY || "", { apiVersion: "2023-10-16" });
-const prisma = new PrismaClient();
 
 export async function POST(req: Request) {
   const sig = req.headers.get("stripe-signature");
