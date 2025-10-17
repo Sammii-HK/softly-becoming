@@ -15,6 +15,26 @@ const PACK_CONFIGS = [
     description: 'Beautiful quotes about finding strength in gentleness. Both square and portrait formats included.'
   },
   {
+    name: 'soft-strength-collection-vol2',
+    series: 'soft-strength',
+    count: 25,
+    seed: 67890, // Different seed = different quotes!
+    theme: 'soft_strength',
+    format: 'both' as const,
+    price: 29,
+    description: 'Volume 2: More beautiful quotes about finding strength in gentleness. Both square and portrait formats included.'
+  },
+  {
+    name: 'soft-strength-collection-vol3',
+    series: 'soft-strength',
+    count: 25,
+    seed: 98765, // Another different seed
+    theme: 'soft_strength',
+    format: 'both' as const,
+    price: 29,
+    description: 'Volume 3: Even more beautiful quotes about finding strength in gentleness. Both square and portrait formats included.'
+  },
+  {
     name: 'rebuilding-journey',
     series: 'rebuilding',
     count: 20,
@@ -23,6 +43,16 @@ const PACK_CONFIGS = [
     format: 'square' as const,
     price: 24,
     description: 'Inspiring quotes for women starting over and rebuilding their lives with intention.'
+  },
+  {
+    name: 'rebuilding-journey-vol2',
+    series: 'rebuilding',
+    count: 20,
+    seed: 11111, // Different seed for volume 2
+    theme: 'rebuilding',
+    format: 'square' as const,
+    price: 24,
+    description: 'Volume 2: More inspiring quotes for women rebuilding their lives with grace and intention.'
   },
   {
     name: 'self-trust-quotes',
@@ -56,6 +86,56 @@ const PACK_CONFIGS = [
   }
 ];
 
+// Generate date-based seed for unique quotes each time
+function generateDateBasedSeed(baseTheme: string): number {
+  const now = new Date();
+  const dateString = `${now.getFullYear()}-${now.getMonth()}-${now.getDate()}-${now.getHours()}-${now.getMinutes()}`;
+  const themeHash = baseTheme.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0);
+  return parseInt(dateString.replace(/-/g, '')) + themeHash;
+}
+
+// Create pack config with dynamic seed and volume numbering
+async function createPackConfig(baseConfig: any) {
+  const dynamicSeed = generateDateBasedSeed(baseConfig.theme || baseConfig.name);
+  
+  // Get existing volume count from Stripe for this series
+  let volumeNumber = 1;
+  try {
+    const stripe = new (await import('stripe')).default(process.env.STRIPE_SECRET_KEY!, {
+      apiVersion: "2023-10-16",
+    });
+    
+    const existingProducts = await stripe.products.list({
+      active: true,
+      limit: 100,
+    });
+    
+    // Count existing products with the same base name
+    const sameThemeCount = existingProducts.data.filter(product => 
+      product.name.toLowerCase().includes(baseConfig.name.toLowerCase()) ||
+      product.metadata?.series === baseConfig.series
+    ).length;
+    
+    volumeNumber = sameThemeCount + 1;
+  } catch (error) {
+    console.log("Could not fetch existing products for volume numbering, using timestamp");
+    volumeNumber = Math.floor(Date.now() / 1000) % 1000; // Fallback to timestamp-based
+  }
+  
+  const volumeName = volumeNumber === 1 ? baseConfig.name : `${baseConfig.name}-vol${volumeNumber}`;
+  const volumeDescription = volumeNumber === 1 
+    ? baseConfig.description 
+    : `Volume ${volumeNumber}: ${baseConfig.description}`;
+  
+  return {
+    ...baseConfig,
+    seed: dynamicSeed,
+    name: volumeName,
+    description: volumeDescription,
+    volume: volumeNumber
+  };
+}
+
 export async function POST(req: NextRequest) {
   try {
     // Admin authentication
@@ -77,25 +157,27 @@ export async function POST(req: NextRequest) {
     const results = [];
 
     if (generateAll) {
-      // Generate all predefined packs
-      for (const config of PACK_CONFIGS) {
-        const result = await generateAndUploadPack(config);
+      // Generate all predefined packs with dynamic seeds and volume numbers
+      for (const baseConfig of PACK_CONFIGS) {
+        const dynamicConfig = await createPackConfig(baseConfig);
+        const result = await generateAndUploadPack(dynamicConfig);
         results.push(result);
         
-        // Delay between packs
-        await new Promise(resolve => setTimeout(resolve, 2000));
+        // Delay between packs to ensure different timestamps and volume numbers
+        await new Promise(resolve => setTimeout(resolve, 3000));
       }
     } else if (packName) {
-      // Generate specific pack
-      const config = PACK_CONFIGS.find(p => p.name === packName);
-      if (!config) {
+      // Generate specific pack with dynamic seed and volume number
+      const baseConfig = PACK_CONFIGS.find(p => p.name === packName);
+      if (!baseConfig) {
         return NextResponse.json({
           error: `Pack "${packName}" not found`,
           available: PACK_CONFIGS.map(p => p.name)
         }, { status: 404 });
       }
       
-      const result = await generateAndUploadPack(config);
+      const dynamicConfig = await createPackConfig(baseConfig);
+      const result = await generateAndUploadPack(dynamicConfig);
       results.push(result);
     } else {
       return NextResponse.json({
