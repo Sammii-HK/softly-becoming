@@ -3,8 +3,9 @@ generator client {
 }
 
 datasource db {
-  provider = "sqlite"
+  provider = "postgresql"
   url = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
 }
 
 model Subscriber {
@@ -27,7 +28,7 @@ model EmailEvent {
   messageId    String?
   type         String     // "delivered", "opened", "clicked"
   ts           DateTime   @default(now())
-  meta         String?    // JSON as string
+  meta         Json?      // JSON type works in PostgreSQL
 }
 
 model Letter {
@@ -36,7 +37,7 @@ model Letter {
   subject    String
   theme      String
   lineToKeep String
-  bodyJson   String    // JSON as string
+  bodyJson   Json      // JSON type works in PostgreSQL
   bodyHtml   String
   bodyText   String
   status     String    @default("DRAFT")  // "DRAFT", "SCHEDULED", "SENT"
