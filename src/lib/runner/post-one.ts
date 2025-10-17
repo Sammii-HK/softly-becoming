@@ -25,7 +25,7 @@ export async function postOne(opts: { seed?: number; weekday?: number }) {
     const text = encodeURIComponent(guarded.lines.join("\n"));
     const imageUrl = `${process.env.NEXT_PUBLIC_BASE_URL}/api/og?text=${text}`;
 
-    const caption = buildCaption(guarded.lines[0]);
+    const caption = buildCaption(guarded.lines[0], q.theme, guarded.lines);
 
     const result = await postToSucculent({ 
       content: caption, 

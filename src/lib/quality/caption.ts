@@ -1,37 +1,52 @@
 import { toUK } from "./ukSpelling";
 
-const CTAs = [
-  "Likes and comments help more than you know and make a huge difference to me.",
-  "If this resonated, a like or comment really helps the post reach more people.",
-  "Your likes and comments genuinely help visibility and keep this project going.",
+const InspirationalClosers = [
+  "You are exactly where you need to be.",
+  "Trust the gentle process of becoming.",
+  "Your journey is sacred and worthy.",
+  "Every small step is transformation.",
+  "You're growing beautifully, even when it doesn't feel like it.",
+  "Gentle progress is still progress.",
+  "Your softness is your strength."
 ];
 
-const Closers = [
-  "Thank you for being here.",
-  "I'm growing this from the ground up. Thank you for the support.",
-  "I appreciate you more than you know.",
+// Dynamic hashtags based on quote theme and content
+const ThemeHashtags = {
+  'soft_strength': ['#gentlestrength', '#softpower', '#quietconfidence'],
+  'rebuilding': ['#rebuilding', '#startingover', '#secondchances'],
+  'self_trust': ['#selftrust', '#innerwisdom', '#trustyourself'],
+  'letting_go': ['#lettinggo', '#gentleboundaries', '#release'],
+  'becoming': ['#becoming', '#transformation', '#growth'],
+  'healing': ['#gentlehealing', '#healingjourney', '#selfcompassion']
+};
+
+const UniversalHashtags = [
+  '#softlybecoming', '#gentlewisdom', '#authenticself', 
+  '#mindfulmoments', '#selfkindness', '#gentletransformation',
+  '#quietstrength', '#intentionalliving', '#selfacceptance'
 ];
 
-const Hashtags = [
-  "#softstrength", "#rebuilding", "#healing"
-]; // max 3, no label
-
-export function buildCaption(firstLine: string) {
-  const cta = CTAs[Math.floor(Math.random() * CTAs.length)];
-  const close = Closers[Math.floor(Math.random() * Closers.length)];
+export function buildCaption(firstLine: string, theme = 'becoming', fullQuote?: string[]) {
+  const closer = InspirationalClosers[Math.floor(Math.random() * InspirationalClosers.length)];
+  
+  // Get theme-specific hashtags
+  const themeHashtags = ThemeHashtags[theme as keyof typeof ThemeHashtags] || ThemeHashtags['becoming'];
+  const universalHashtags = UniversalHashtags.slice(0, 2); // Pick 2 universal ones
+  
+  // Mix theme and universal hashtags (max 5 total)
+  const allHashtags = [...themeHashtags, ...universalHashtags].slice(0, 5);
 
   // Sentence case for first line in caption
   const lead = firstLine.charAt(0).toUpperCase() + firstLine.slice(1);
 
+  // Create inspiring, non-needy caption
   const body = `${lead}
 
-This one's for the women rebuilding softly.
+For the women choosing to rebuild with intention.
 
-${cta}
-Comment a 🤍 if this reached you.
+${closer}
 
-${close}
-${Hashtags.join(" ")}`;
+${allHashtags.join(" ")}`;
 
   return toUK(body);
 }
