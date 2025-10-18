@@ -11,7 +11,7 @@ interface ProductPack {
   totalImages: number;
   previewImage: string;
   format: string;
-  prices: {
+  prices?: {
     personal: { priceId: string; amount: number; formatted: string };
     commercial: { priceId: string; amount: number; formatted: string };
     extended: { priceId: string; amount: number; formatted: string };
@@ -27,8 +27,12 @@ export default function ProductCard({ product }: ProductCardProps) {
   const [loading, setLoading] = useState(false);
   const currency = getDefaultCurrency();
 
-  // Use Stripe prices as SSOT (already formatted from API)
-  const prices = product.prices;
+  // Use Stripe prices as SSOT (already formatted from API) or fallback to calculated prices
+  const prices = product.prices || {
+    personal: { priceId: '', amount: 399, formatted: '£3.99' },
+    commercial: { priceId: '', amount: 799, formatted: '£7.99' },
+    extended: { priceId: '', amount: 1299, formatted: '£12.99' }
+  };
 
   const handlePurchase = async () => {
     setLoading(true);

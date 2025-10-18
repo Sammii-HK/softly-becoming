@@ -10,12 +10,15 @@ interface ProductPack {
   version: string;
   generatedAt: string;
   totalImages: number;
-  price: number;
   description: string;
   previewImage: string;
   format: string;
   theme?: string;
-  stripePriceId: string;
+  prices?: {
+    personal: { priceId: string; amount: number; formatted: string };
+    commercial: { priceId: string; amount: number; formatted: string };
+    extended: { priceId: string; amount: number; formatted: string };
+  };
 }
 
 interface SeriesData {
