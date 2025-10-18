@@ -40,11 +40,11 @@ interface DailyReviewData {
   };
   issues: string[];
   tomorrowsContent?: {
-    morning: string;
-    afternoon: string;
-    evening: string;
-    night: string;
-    newsletter: string;
+    morning?: string;
+    afternoon?: string;
+    evening?: string;
+    night?: string;
+    newsletter?: string;
   };
 }
 
