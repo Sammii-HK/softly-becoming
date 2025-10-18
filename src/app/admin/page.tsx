@@ -27,6 +27,25 @@ export default function AdminDashboard() {
       setSending(null);
     }
   };
+
+  const sendDailyReview = async () => {
+    setSending('review');
+    try {
+      const response = await fetch('/api/admin/daily-review');
+      const result = await response.json();
+      
+      if (result.success) {
+        alert(`📱 Daily review sent to your phone! Check Pushover app.`);
+      } else {
+        alert(`❌ Failed to send review: ${result.error}`);
+      }
+    } catch (error) {
+      alert(`❌ Error sending review: ${error}`);
+    } finally {
+      setSending(null);
+    }
+  };
+
   return (
     <main className="min-h-screen bg-[#FAF9F7] text-[#3A3A3A]">
       <div className="max-w-7xl mx-auto px-6 py-16">
@@ -108,6 +127,10 @@ export default function AdminDashboard() {
                 <div className="font-medium">Product Generation</div>
                 <div className="text-sm text-gray-600">Create quote packs → Blob → Stripe</div>
               </a>
+              <a href="/admin/distribution" className="block p-3 bg-gray-50 rounded hover:bg-gray-100 transition-colors">
+                <div className="font-medium">Multi-Platform Distribution</div>
+                <div className="text-sm text-gray-600">Distribute to Etsy, Gumroad & more</div>
+              </a>
               <a href="/admin/stripe" className="block p-3 bg-gray-50 rounded hover:bg-gray-100 transition-colors">
                 <div className="font-medium">Stripe Management</div>
                 <div className="text-sm text-gray-600">Sync products, manage pricing</div>
@@ -154,6 +177,16 @@ export default function AdminDashboard() {
                   {sending === 'newsletter' ? '⏳ Sending...' : '📰 Send Test Newsletter'}
                 </div>
                 <div className="text-sm text-blue-600">Preview newsletter format</div>
+              </button>
+              <button 
+                onClick={() => sendDailyReview()}
+                disabled={sending === 'review'}
+                className="w-full text-left p-3 bg-orange-50 rounded hover:bg-orange-100 transition-colors border border-orange-200 disabled:opacity-50"
+              >
+                <div className="font-medium text-orange-800">
+                  {sending === 'review' ? '⏳ Sending...' : '📱 Send Daily Review'}
+                </div>
+                <div className="text-sm text-orange-600">Get business summary via Pushover</div>
               </button>
               <a href="/api/health" target="_blank" className="block p-3 bg-gray-50 rounded hover:bg-gray-100 transition-colors">
                 <div className="font-medium">System Status</div>
