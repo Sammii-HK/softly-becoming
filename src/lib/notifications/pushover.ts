@@ -39,6 +39,13 @@ interface DailyReviewData {
     thisMonth: number;
   };
   issues: string[];
+  tomorrowsContent?: {
+    morning: string;
+    afternoon: string;
+    evening: string;
+    night: string;
+    newsletter: string;
+  };
 }
 
 export async function sendDailyReview(data: DailyReviewData) {

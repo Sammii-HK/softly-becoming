@@ -15,15 +15,22 @@ export async function GET(req: Request) {
 
   try {
     const reviewData = await gatherDailyReviewData();
-    
-    // Send Pushover notification
-    const notificationResult = await sendDailyReview(reviewData);
-    
+
+    if (reviewData !== null && reviewData !== undefined) {
+      // Send Pushover notification
+      const notificationResult = await sendDailyReview(reviewData);
+      
+      return NextResponse.json({
+        success: true,
+        message: "Daily review sent successfully",
+        data: reviewData,
+        notification: notificationResult
+      });
+    }
+
     return NextResponse.json({
-      success: true,
-      message: "Daily review sent successfully",
-      data: reviewData,
-      notification: notificationResult
+      success: false,
+      message: "No review data available"
     });
 
   } catch (error) {
